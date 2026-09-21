@@ -4,8 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misia Jacinta - Arepas Especiales</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Importación de Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto+Mono:wght@700;900&display=swap" rel="stylesheet">
+    
     <style>
+        /* =========================================================
+           AQUÍ CAMBIAS EL TIPO DE FUENTE Y EL TAMAÑO DE LOS PRECIOS
+           ========================================================= */
+        :root {
+            /* Fuente de los precios en las arepas */
+            --fuente-precios: 'Roboto Mono', monospace;
+            
+            /* Fuente de la tarjeta BCV */
+            --fuente-bcv: 'Montserrat', sans-serif;
+
+            /* Tamaños de los precios de las Arepas (en vw para escalar con la pantalla) */
+            --tamano-precio-ref: 0.85vw; 
+            --tamano-precio-bs: 0.80vw;
+            --tamano-etiqueta: 0.65vw;  /* "Ref:" y "Bs." */
+
+            /* Tamaños dentro de la tarjeta flotante BCV */
+            --tamano-bcv-titulo: 0.70vw;
+            --tamano-bcv-monto: 1.15vw;
+            --tamano-bcv-unidad: 0.70vw; /* "Bs./USD" */
+            --tamano-bcv-fecha: 0.75vw;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -20,14 +44,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Roboto Mono', monospace;
+            font-family: var(--fuente-precios);
         }
 
-        /* Canvas 16:9 ajustado a pantallas horizontales estándar */
+        /* Canvas horizontal 16:9 que encaja en cualquier TV */
         #tv-canvas {
             position: relative;
             width: 100vw;
-            height: 56.25vw; /* Ratio 16:9 */
+            height: 56.25vw;
             max-height: 100vh;
             max-width: 177.78vh;
             background-image: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Arepas-Espaciales.png');
@@ -37,125 +61,255 @@
             overflow: hidden;
         }
 
-        /* Contenedor de Precios de cada Arepa */
+        /* =========================================================
+           TARJETA FLOTANTE BCV OFICIAL
+           ========================================================= */
+        #bcv-card {
+            position: absolute;
+            top: 2.8%;
+            right: 2.5%;
+            background: #ffffff;
+            border: 2.5px solid #200a5e; /* Borde azul/morado oscuro oficial */
+            border-radius: 14px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 10px;
+            gap: 12px;
+            z-index: 50;
+            font-family: var(--fuente-bcv);
+        }
+
+        /* Contenedor del Logo PNG de GitHub */
+        .bcv-logo-wrapper {
+            width: 3.4vw;
+            height: 3.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bcv-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Contenido textual del BCV */
+        .bcv-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .bcv-title {
+            font-size: var(--tamano-bcv-titulo);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bcv-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0;
+        }
+
+        .bcv-rate {
+            font-size: var(--tamano-bcv-monto);
+            font-weight: 900;
+            color: #000000;
+            font-family: var(--fuente-precios);
+        }
+
+        .bcv-unit {
+            font-size: var(--tamano-bcv-unidad);
+            font-weight: 700;
+            color: #4a4a4a;
+        }
+
+        .bcv-date {
+            font-size: var(--tamano-bcv-fecha);
+            font-weight: 700;
+            color: #111111;
+            font-family: var(--fuente-precios);
+        }
+
+        /* =========================================================
+           RANURAS DE PRECIOS PARA LAS 8 AREPAS
+           ========================================================= */
         .arepa-slot {
             position: absolute;
             display: flex;
             justify-content: space-between;
             width: 17.5%;
-            height: 6%;
+            height: 6.2%;
             z-index: 10;
         }
 
-        /* Bloque Mediana y Grande */
+        /* Cada tamaño: Mediana y Grande */
         .size-box {
             width: 48%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            line-height: 1.1;
+            align-items: flex-start;
+            padding-left: 2px;
         }
 
+        /* Fila con el símbolo y el monto pegados en flujo automático */
         .price-line {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            font-size: 0.85vw;
-            font-weight: 900;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 3px;
+            white-space: nowrap;
+            line-height: 1.15;
         }
 
         .price-ref {
-            color: #8a3b00;
+            color: #7c2d00; /* Legible sobre el recuadro amarillo */
+            font-size: var(--tamano-precio-ref);
+            font-weight: 900;
         }
 
         .price-bs {
             color: #ffffff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            font-size: var(--tamano-precio-bs);
+            font-weight: 900;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
         }
 
         .lbl {
-            font-size: 0.6vw;
-            margin-right: 2px;
-            opacity: 0.9;
+            font-size: var(--tamano-etiqueta);
+            font-weight: 700;
+            opacity: 0.95;
         }
 
-        /* Posicionamiento Fila 1 (Superior) */
+        /* Posiciones exactas Fila 1 (Arriba) */
         #arepa-0 { left: 7.2%;  top: 50.5%; } /* Reina */
         #arepa-1 { left: 31.4%; top: 50.5%; } /* Sifrina */
         #arepa-2 { left: 55.6%; top: 50.5%; } /* Catira */
         #arepa-3 { left: 79.8%; top: 50.5%; } /* Llanera */
 
-        /* Posicionamiento Fila 2 (Inferior) */
+        /* Posiciones exactas Fila 2 (Abajo) */
         #arepa-4 { left: 7.2%;  top: 86.5%; } /* Jamón y Queso */
         #arepa-5 { left: 31.4%; top: 86.5%; } /* Pelúa */
         #arepa-6 { left: 55.6%; top: 86.5%; } /* Pérnil */
         #arepa-7 { left: 79.8%; top: 86.5%; } /* Pabellón */
-
-        /* Sello flotante Tasa BCV (Esquina Superior Derecha sobre el logo) */
-        #bcv-badge {
-            position: absolute;
-            top: 4.5%;
-            right: 2.2%;
-            background: rgba(0, 0, 0, 0.75);
-            border: 2px solid #F08F00;
-            border-radius: 12px;
-            padding: 4px 10px;
-            color: #fff;
-            text-align: center;
-            font-size: 0.8vw;
-            font-weight: 700;
-            z-index: 20;
-        }
-
-        #bcv-badge span {
-            color: #F08F00;
-            display: block;
-            font-size: 0.6vw;
-        }
     </style>
 </head>
 <body>
 
     <div id="tv-canvas">
-        <!-- Badge BCV -->
-        <div id="bcv-badge">
-            <span>TASA BCV</span>
-            <div id="val-bcv">---</div>
+        <!-- TARJETA BCV FLOTANTE OFICIAL CON LOGO GITHUB -->
+        <div id="bcv-card">
+            <div class="bcv-logo-wrapper">
+                <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
+            </div>
+            <div class="bcv-details">
+                <span class="bcv-title">TASA BCV OFICIAL</span>
+                <div class="bcv-price-row">
+                    <span class="bcv-rate" id="val-bcv">0,0000</span>
+                    <span class="bcv-unit">Bs./USD</span>
+                </div>
+                <span class="bcv-date" id="val-fecha">--/--/----</span>
+            </div>
         </div>
 
-        <!-- 8 Arepas x 2 Tamaños = 16 Precios en Pantalla -->
+        <!-- 8 AREPAS: MEDIANA Y GRANDE -->
+        <!-- Fila 1 -->
         <div class="arepa-slot" id="arepa-0">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
         <div class="arepa-slot" id="arepa-1">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
         <div class="arepa-slot" id="arepa-2">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
         <div class="arepa-slot" id="arepa-3">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
+        <!-- Fila 2 -->
         <div class="arepa-slot" id="arepa-4">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
         <div class="arepa-slot" id="arepa-5">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
         <div class="arepa-slot" id="arepa-6">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
+
         <div class="arepa-slot" id="arepa-7">
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
-            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+            </div>
         </div>
     </div>
 
@@ -207,6 +361,14 @@
             return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
         }
 
+        function updateSystemDate() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            document.getElementById('val-fecha').innerText = `${d}/${m}/${y}`;
+        }
+
         async function fetchMenuData() {
             try {
                 const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
@@ -217,37 +379,42 @@
 
                 // Fila 2 de Excel = lines[1]
                 for (let i = 0; i < 8; i++) {
-                    const lineIdx = i + 1;
+                    const lineIdx = i + 1; // Fila 2 en adelante
                     if (!lines[lineIdx]) break;
 
                     const cols = parseCSVLine(lines[lineIdx]);
-                    const slot = document.getElementById(`arepa-0`.replace('0', i));
+                    const slot = document.getElementById(`arepa-${i}`);
                     if (!slot) continue;
 
-                    // Mapeo: C=2 (Ref Med), D=3 (Bs Med), E=4 (Ref Gde), F=5 (Bs Gde)
-                    const refMed = formatPrice(cols[2]);
-                    const bsMed  = formatPrice(cols[3]);
-                    const refGde = formatPrice(cols[4]);
-                    const bsGde  = formatPrice(cols[5]);
-
-                    slot.querySelector('.v-ref-m').innerText = refMed;
-                    slot.querySelector('.v-bs-m').innerText  = bsMed;
-                    slot.querySelector('.v-ref-g').innerText = refGde;
-                    slot.querySelector('.v-bs-g').innerText  = bsGde;
+                    // Mapeo:
+                    // Columna C (índice 2) = Ref Mediana
+                    // Columna D (índice 3) = Bs Mediana
+                    // Columna E (índice 4) = Ref Grande
+                    // Columna F (índice 5) = Bs Grande
+                    slot.querySelector('.v-ref-m').innerText = formatPrice(cols[2]);
+                    slot.querySelector('.v-bs-m').innerText  = formatPrice(cols[3]);
+                    slot.querySelector('.v-ref-g').innerText = formatPrice(cols[4]);
+                    slot.querySelector('.v-bs-g').innerText  = formatPrice(cols[5]);
                 }
 
-                // Tasa BCV si está presente en columna G (índice 6) de la primera fila
-                const firstRowCols = parseCSVLine(lines[1]);
-                if (firstRowCols[6]) {
-                    document.getElementById('val-bcv').innerText = formatPrice4(firstRowCols[6]);
+                // Tasa BCV: Columna G (índice 6) de la primera fila de datos
+                const firstRow = parseCSVLine(lines[1]);
+                if (firstRow[6]) {
+                    document.getElementById('val-bcv').innerText = formatPrice4(firstRow[6]);
+                }
+
+                // Si viene fecha en la columna H (índice 7), la usa; si no, deja la del día
+                if (firstRow[7] && firstRow[7].trim() !== "") {
+                    document.getElementById('val-fecha').innerText = firstRow[7].trim();
                 }
 
             } catch (err) {
-                console.error("Error sincronizando precios:", err);
+                console.error("Error sincronizando datos:", err);
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            updateSystemDate();
             fetchMenuData();
             setInterval(fetchMenuData, SYNC_INTERVAL);
         });

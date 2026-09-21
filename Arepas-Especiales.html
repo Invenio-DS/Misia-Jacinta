@@ -4,29 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misia Jacinta - Arepas Especiales</title>
-    <!-- Importación de Fuentes -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto+Mono:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Importación de Fuentes complementarias -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
         /* =========================================================
-           AQUÍ CAMBIAS EL TIPO DE FUENTE Y EL TAMAÑO DE LOS PRECIOS
+           1. CARGA DE LA FUENTE AVENIR-SEMIBOLD VÍA @FONT-FACE
+           ========================================================= */
+        @font-face {
+            font-family: 'Avenir-SemiBold';
+            src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        /* =========================================================
+           2. CONFIGURACIÓN CENTRAL DE TIPOGRAFÍAS Y TAMAÑOS
            ========================================================= */
         :root {
-            /* Fuente de los precios en las arepas */
-            --fuente-precios: 'Roboto Mono', monospace;
+            /* Fuente personalizada cargada arriba */
+            --fuente-precios: 'Avenir-SemiBold', sans-serif;
             
             /* Fuente de la tarjeta BCV */
             --fuente-bcv: 'Montserrat', sans-serif;
 
             /* Tamaños de los precios de las Arepas (en vw para escalar con la pantalla) */
-            --tamano-precio-ref: 0.85vw; 
-            --tamano-precio-bs:  0.80vw;
-            --tamano-etiqueta:   0.65vw;  /* "Ref:" y "Bs." */
+            --tamano-precio-ref: 0.90vw; 
+            --tamano-precio-bs:  1.00vw;
+            --tamano-etiqueta:   0.75vw;  /* "Ref:" y "Bs." */
 
             /* Tamaños dentro de la tarjeta flotante BCV */
-            --tamano-bcv-titulo: 0.70vw;
-            --tamano-bcv-monto:  1.15vw;
-            --tamano-bcv-unidad: 0.70vw; /* "Bs./USD" */
+            --tamano-bcv-titulo: 0.80vw;
+            --tamano-bcv-monto:  1.20vw;
+            --tamano-bcv-unidad: 0.75vw; /* "Bs./USD" */
             --tamano-bcv-fecha:  0.75vw;
         }
 
@@ -172,19 +182,19 @@
         .price-ref {
             color: #7c2d00;
             font-size: var(--tamano-precio-ref);
-            font-weight: 900;
+            font-weight: 600;
         }
 
         .price-bs {
             color: #ffffff;
             font-size: var(--tamano-precio-bs);
-            font-weight: 900;
+            font-weight: 600;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
         }
 
         .lbl {
             font-size: var(--tamano-etiqueta);
-            font-weight: 700;
+            font-weight: 600;
             opacity: 0.95;
         }
 
@@ -329,7 +339,6 @@
             return result;
         }
 
-        // Parser para precios normales (Precios del menú en Ref y Bs)
         function parseCustomFloat(val) {
             if (!val) return 0;
             let str = String(val).trim();
@@ -348,16 +357,12 @@
             return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // Formateador exclusivo para la Tasa BCV (Garantiza 4 decimales sin alterar decimales)
         function formatBCVRate(val) {
             if (!val) return "0,0000";
             let str = String(val).trim();
-            
-            // Si viene con coma (ej: "849,5640"), la pasa a punto para JS
             if (str.includes(',')) {
                 str = str.replace(',', '.');
             }
-            
             let n = parseFloat(str);
             if (isNaN(n) || n === 0) return "0,0000";
             return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
@@ -436,7 +441,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('val-fecha').innerText = getTodayFormatted();
-            
             fetchMenuData();
             fetchTasaBCV();
 

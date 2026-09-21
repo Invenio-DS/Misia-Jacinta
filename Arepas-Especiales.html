@@ -19,15 +19,15 @@
             --fuente-bcv: 'Montserrat', sans-serif;
 
             /* Tamaños de los precios de las Arepas (en vw para escalar con la pantalla) */
-            --tamano-precio-ref: 0.85vw; 
-            --tamano-precio-bs: 0.80vw;
-            --tamano-etiqueta: 0.65vw;  /* "Ref:" y "Bs." */
+            --tamano-precio-ref: 1.00vw; 
+            --tamano-precio-bs:  1.30vw;
+            --tamano-etiqueta:   0.85vw;  /* "Ref:" y "Bs." */
 
             /* Tamaños dentro de la tarjeta flotante BCV */
-            --tamano-bcv-titulo: 0.70vw;
-            --tamano-bcv-monto: 1.15vw;
-            --tamano-bcv-unidad: 0.70vw; /* "Bs./USD" */
-            --tamano-bcv-fecha: 0.75vw;
+            --tamano-bcv-titulo: 0.90vw;
+            --tamano-bcv-monto:  1.30vw;
+            --tamano-bcv-unidad: 0.90vw; /* "Bs./USD" */
+            --tamano-bcv-fecha:  0.75vw;
         }
 
         * {
@@ -69,7 +69,7 @@
             top: 2.8%;
             right: 2.5%;
             background: #ffffff;
-            border: 2.5px solid #200a5e; /* Borde azul/morado oscuro oficial */
+            border: 2.5px solid #200a5e; /* Borde oficial azul oscuro/morado */
             border-radius: 14px;
             box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
             display: flex;
@@ -162,7 +162,7 @@
             padding-left: 2px;
         }
 
-        /* Fila con el símbolo y el monto pegados en flujo automático */
+        /* Fila con el símbolo y el monto pegados en flujo dinámico */
         .price-line {
             display: inline-flex;
             align-items: baseline;
@@ -191,13 +191,13 @@
         }
 
         /* Posiciones exactas Fila 1 (Arriba) */
-        #arepa-0 { left: 7.2%;  top: 50.5%; } /* Reina */
+        #arepa-0 { left: 8.2%;  top: 50.5%; } /* Reina */
         #arepa-1 { left: 31.4%; top: 50.5%; } /* Sifrina */
         #arepa-2 { left: 55.6%; top: 50.5%; } /* Catira */
         #arepa-3 { left: 79.8%; top: 50.5%; } /* Llanera */
 
         /* Posiciones exactas Fila 2 (Abajo) */
-        #arepa-4 { left: 7.2%;  top: 86.5%; } /* Jamón y Queso */
+        #arepa-4 { left: 8.2%;  top: 86.5%; } /* Jamón y Queso */
         #arepa-5 { left: 31.4%; top: 86.5%; } /* Pelúa */
         #arepa-6 { left: 55.6%; top: 86.5%; } /* Pérnil */
         #arepa-7 { left: 79.8%; top: 86.5%; } /* Pabellón */
@@ -314,8 +314,10 @@
     </div>
 
     <script>
+        // URLs de sincronización
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
-        const SYNC_INTERVAL = 3600000;
+        const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
+        const SYNC_INTERVAL = 3600000; // 1 Hora
 
         function parseCSVLine(line) {
             const result = [];
@@ -332,6 +334,7 @@
             return result;
         }
 
+        // Intérprete inteligente de cadenas numéricas con puntos o comas
         function parseCustomFloat(val) {
             if (!val) return 0;
             let str = String(val).trim();
@@ -361,14 +364,15 @@
             return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
         }
 
-        function updateSystemDate() {
+        function getTodayFormatted() {
             const now = new Date();
             const d = String(now.getDate()).padStart(2, '0');
             const m = String(now.getMonth() + 1).padStart(2, '0');
             const y = now.getFullYear();
-            document.getElementById('val-fecha').innerText = `${d}/${m}/${y}`;
+            return `${d}/${m}/${y}`;
         }
 
+        // Consulta de precios de las Arepas desde Google Sheets
         async function fetchMenuData() {
             try {
                 const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
@@ -377,16 +381,15 @@
 
                 if (lines.length < 2) return;
 
-                // Fila 2 de Excel = lines[1]
+                // Mapeo de las 8 arepas a partir de la fila 2 del CSV (índice 1)
                 for (let i = 0; i < 8; i++) {
-                    const lineIdx = i + 1; // Fila 2 en adelante
+                    const lineIdx = i + 1;
                     if (!lines[lineIdx]) break;
 
                     const cols = parseCSVLine(lines[lineIdx]);
                     const slot = document.getElementById(`arepa-${i}`);
                     if (!slot) continue;
 
-                    // Mapeo:
                     // Columna C (índice 2) = Ref Mediana
                     // Columna D (índice 3) = Bs Mediana
                     // Columna E (índice 4) = Ref Grande
@@ -396,27 +399,64 @@
                     slot.querySelector('.v-ref-g').innerText = formatPrice(cols[4]);
                     slot.querySelector('.v-bs-g').innerText  = formatPrice(cols[5]);
                 }
-
-                // Tasa BCV: Columna G (índice 6) de la primera fila de datos
-                const firstRow = parseCSVLine(lines[1]);
-                if (firstRow[6]) {
-                    document.getElementById('val-bcv').innerText = formatPrice4(firstRow[6]);
-                }
-
-                // Si viene fecha en la columna H (índice 7), la usa; si no, deja la del día
-                if (firstRow[7] && firstRow[7].trim() !== "") {
-                    document.getElementById('val-fecha').innerText = firstRow[7].trim();
-                }
-
             } catch (err) {
-                console.error("Error sincronizando datos:", err);
+                console.error("Error sincronizando menú:", err);
+            }
+        }
+
+        // Consulta de la Tasa Oficial BCV desde tasa.json en GitHub
+        async function fetchTasaBCV() {
+            try {
+                const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error("Error obteniendo tasa.json");
+                
+                const data = await response.json();
+
+                // Busca la tasa soportando estructuras directas o anidadas
+                let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
+                if (!rawTasa && typeof data === 'object') {
+                    // Si viene como lista o propiedades no estándar, busca el primer valor numérico
+                    const keys = Object.keys(data);
+                    for (let k of keys) {
+                        if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
+                            rawTasa = data[k];
+                            break;
+                        }
+                    }
+                }
+
+                // Busca la fecha en el JSON o aplica la fecha actual del sistema
+                let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
+
+                if (rawTasa) {
+                    const formattedRate = formatPrice4(rawTasa);
+                    document.getElementById('val-bcv').innerText = formattedRate;
+                    document.getElementById('val-fecha').innerText = rawFecha;
+
+                    // Guarda en caché local de contingencia
+                    localStorage.setItem('cached_tasa_bcv', formattedRate);
+                    localStorage.setItem('cached_fecha_bcv', rawFecha);
+                }
+            } catch (err) {
+                console.error("Error obteniendo tasa desde JSON:", err);
+                // Si falla la red, carga el último valor registrado en el TV
+                const cachedRate = localStorage.getItem('cached_tasa_bcv');
+                const cachedDate = localStorage.getItem('cached_fecha_bcv');
+                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
+                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            updateSystemDate();
+            document.getElementById('val-fecha').innerText = getTodayFormatted();
+            
+            // Cargas iniciales
             fetchMenuData();
+            fetchTasaBCV();
+
+            // Intervalos de actualización automática
             setInterval(fetchMenuData, SYNC_INTERVAL);
+            setInterval(fetchTasaBCV, SYNC_INTERVAL);
         });
     </script>
 </body>

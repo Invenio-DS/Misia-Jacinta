@@ -3,185 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Arepas Especiales - Misia Jacinta</title>
+    <title>Misia Jacinta - Arepas Especiales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
-        body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #000;
-            font-family: 'Arial Black', 'Arial', sans-serif;
-        }
-
-        /* Contenedor principal con tu imagen de fondo integrada desde GitHub */
-        .menu-container {
-            position: relative;
+        body, html {
             width: 100%;
             height: 100%;
-            background-image: url('https://github.com/Invenio-DS/Misia-Jacinta/blob/main/Arepas-Espaciales.png');
-            background-size: cover;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Canvas 16:9 ajustado a pantallas horizontales estÃ¡ndar */
+        #tv-canvas {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw; /* Ratio 16:9 */
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-image: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Arepas-Espaciales.png');
+            background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
+            overflow: hidden;
         }
 
-        /* Contenedor general del Grid de precios */
-        .grid-precios {
+        /* Contenedor de Precios de cada Arepa */
+        .arepa-slot {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
-            padding-left: 2.2%;
-            padding-right: 2.2%;
+            width: 17.5%;
+            height: 6%;
+            z-index: 10;
         }
 
-        /* Cada fila de precios (8 columnas exactas) */
-        .fila-arepas {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            width: 100%;
-            gap: 10px;
-        }
-
-        /* Posicionamiento vertical exacto sobre los recuadros amarillos */
-        .fila-superior {
-            margin-top: 24.3%;
-        }
-
-        .fila-inferior {
-            margin-bottom: 9.3%;
-        }
-
-        /* Estilo individual para cada celda de precio en el menú */
-        .precio-celda {
+        /* Bloque Mediana y Grande */
+        .size-box {
+            width: 48%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 1.05vw; /* Tipografía fluida para pantallas comerciales */
-            font-weight: 900;
-            color: #5c2d16; /* Marrón corporativo Misia Jacinta */
-            text-align: center;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
-        /* Estilo pequeño opcional para diferenciar la moneda o etiqueta REF */
-        .ref-tag {
-            font-size: 0.75vw;
-            opacity: 0.85;
-            font-weight: bold;
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.85vw;
+            font-weight: 900;
+        }
+
+        .price-ref {
+            color: #8a3b00;
+        }
+
+        .price-bs {
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .lbl {
+            font-size: 0.6vw;
+            margin-right: 2px;
+            opacity: 0.9;
+        }
+
+        /* Posicionamiento Fila 1 (Superior) */
+        #arepa-0 { left: 7.2%;  top: 50.5%; } /* Reina */
+        #arepa-1 { left: 31.4%; top: 50.5%; } /* Sifrina */
+        #arepa-2 { left: 55.6%; top: 50.5%; } /* Catira */
+        #arepa-3 { left: 79.8%; top: 50.5%; } /* Llanera */
+
+        /* Posicionamiento Fila 2 (Inferior) */
+        #arepa-4 { left: 7.2%;  top: 86.5%; } /* JamÃ³n y Queso */
+        #arepa-5 { left: 31.4%; top: 86.5%; } /* PelÃºa */
+        #arepa-6 { left: 55.6%; top: 86.5%; } /* PÃ©rnil */
+        #arepa-7 { left: 79.8%; top: 86.5%; } /* PabellÃ³n */
+
+        /* Sello flotante Tasa BCV (Esquina Superior Derecha sobre el logo) */
+        #bcv-badge {
+            position: absolute;
+            top: 4.5%;
+            right: 2.2%;
+            background: rgba(0, 0, 0, 0.75);
+            border: 2px solid #F08F00;
+            border-radius: 12px;
+            padding: 4px 10px;
+            color: #fff;
+            text-align: center;
+            font-size: 0.8vw;
+            font-weight: 700;
+            z-index: 20;
+        }
+
+        #bcv-badge span {
+            color: #F08F00;
+            display: block;
+            font-size: 0.6vw;
         }
     </style>
 </head>
 <body>
 
-    <div class="menu-container">
-        <div class="grid-precios">
-            
-            <!-- FILA SUPERIOR (8 Columnas: 4 arepas x 2 tamaños cada una) -->
-            <div class="fila-arepas fila-superior">
-                <!-- Reina -->
-                <div class="precio-celda" id="reina-med">...</div>
-                <div class="precio-celda" id="reina-grd">...</div>
-                <!-- Sifrina -->
-                <div class="precio-celda" id="sifrina-med">...</div>
-                <div class="precio-celda" id="sifrina-grd">...</div>
-                <!-- Catira -->
-                <div class="precio-celda" id="catira-med">...</div>
-                <div class="precio-celda" id="catira-grd">...</div>
-                <!-- Llanera -->
-                <div class="precio-celda" id="llanera-med">...</div>
-                <div class="precio-celda" id="llanera-grd">...</div>
-            </div>
+    <div id="tv-canvas">
+        <!-- Badge BCV -->
+        <div id="bcv-badge">
+            <span>TASA BCV</span>
+            <div id="val-bcv">---</div>
+        </div>
 
-            <!-- FILA INFERIOR (8 Columnas: 4 arepas x 2 tamaños cada una) -->
-            <div class="fila-arepas fila-inferior">
-                <!-- Jamón y Queso -->
-                <div class="precio-celda" id="jamon-med">...</div>
-                <div class="precio-celda" id="jamon-grd">...</div>
-                <!-- Pelúa -->
-                <div class="precio-celda" id="pelua-med">...</div>
-                <div class="precio-celda" id="pelua-grd">...</div>
-                <!-- Párnil -->
-                <div class="precio-celda" id="pernil-med">...</div>
-                <div class="precio-celda" id="pernil-grd">...</div>
-                <!-- Pabellón -->
-                <div class="precio-celda" id="pabellon-med">...</div>
-                <div class="precio-celda" id="pabellon-grd">...</div>
-            </div>
-
+        <!-- 8 Arepas x 2 TamaÃ±os = 16 Precios en Pantalla -->
+        <div class="arepa-slot" id="arepa-0">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-1">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-2">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-3">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-4">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-5">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-6">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
+        </div>
+        <div class="arepa-slot" id="arepa-7">
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">...</span></div></div>
+            <div class="size-box"><div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-g">...</span></div><div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">...</span></div></div>
         </div>
     </div>
 
     <script>
-        const urlSheetsCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
+        const SYNC_INTERVAL = 3600000;
 
-        async function actualizarCarteleraDigital() {
+        function parseCSVLine(line) {
+            const result = [];
+            let curValue = "";
+            let inQuotes = false;
+            for (let char of line) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) {
+                    result.push(curValue);
+                    curValue = "";
+                } else curValue += char;
+            }
+            result.push(curValue);
+            return result;
+        }
+
+        function parseCustomFloat(val) {
+            if (!val) return 0;
+            let str = String(val).trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            } else if (str.includes('.')) {
+                const parts = str.split('.');
+                if (parts[parts.length - 1].length > 2) {
+                    str = str.replace(/\./g, '');
+                }
+            }
+            let n = parseFloat(str.replace(/[^\d.-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatPrice(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,00";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatPrice4(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,0000";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        async function fetchMenuData() {
             try {
-                const respuesta = await fetch(urlSheetsCsv + "&t=" + new Date().getTime());
-                const textoCsv = await respuesta.text();
-                
-                // Parseamos las filas del archivo de Sheets
-                const filas = textoCsv.split("\n").map(f => f.split(","));
-                
-                // Función interna para limpiar las comillas de las celdas de Sheets del formato CSV
-                function limpiar(texto) {
-                    return texto ? texto.replace(/"/g, '').trim() : "0,00";
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
+
+                if (lines.length < 2) return;
+
+                // Fila 2 de Excel = lines[1]
+                for (let i = 0; i < 8; i++) {
+                    const lineIdx = i + 1;
+                    if (!lines[lineIdx]) break;
+
+                    const cols = parseCSVLine(lines[lineIdx]);
+                    const slot = document.getElementById(`arepa-0`.replace('0', i));
+                    if (!slot) continue;
+
+                    // Mapeo: C=2 (Ref Med), D=3 (Bs Med), E=4 (Ref Gde), F=5 (Bs Gde)
+                    const refMed = formatPrice(cols[2]);
+                    const bsMed  = formatPrice(cols[3]);
+                    const refGde = formatPrice(cols[4]);
+                    const bsGde  = formatPrice(cols[5]);
+
+                    slot.querySelector('.v-ref-m').innerText = refMed;
+                    slot.querySelector('.v-bs-m').innerText  = bsMed;
+                    slot.querySelector('.v-ref-g').innerText = refGde;
+                    slot.querySelector('.v-bs-g').innerText  = bsGde;
                 }
 
-                // Función interna para generar la estructura visual del precio dentro del recuadro
-                function generarHtmlPrecio(bs, ref) {
-                    return `<div>${limpiar(bs)}</div><div class="ref-tag">$${limpiar(ref)}</div>`;
+                // Tasa BCV si estÃ¡ presente en columna G (Ã­ndice 6) de la primera fila
+                const firstRowCols = parseCSVLine(lines[1]);
+                if (firstRowCols[6]) {
+                    document.getElementById('val-bcv').innerText = formatPrice4(firstRowCols[6]);
                 }
 
-                // =========================================================================
-                // CORRECCIÓN: ASIGNACIÓN INDIVIDUAL POR CADA FILA RECTIFICANDO TU CSV [1]
-                // =========================================================================
-                
-                // Fila Superior (Arepas 1 a 4) [1]
-                document.getElementById('reina-med').innerHTML = generarHtmlPrecio(filas[1][3], filas[1][2]); [1]
-                document.getElementById('reina-grd').innerHTML = generarHtmlPrecio(filas[1][5], filas[1][4]); [1]
-                
-                document.getElementById('sifrina-med').innerHTML = generarHtmlPrecio(filas[2][3], filas[2][2]); [1]
-                document.getElementById('sifrina-grd').innerHTML = generarHtmlPrecio(filas[2][5], filas[2][4]); [1]
-                
-                document.getElementById('catira-med').innerHTML = generarHtmlPrecio(filas[3][3], filas[3][2]); [1]
-                document.getElementById('catira-grd').innerHTML = generarHtmlPrecio(filas[3][5], filas[3][4]); [1]
-                
-                document.getElementById('llanera-med').innerHTML = generarHtmlPrecio(filas[4][3], filas[4][2]); [1]
-                document.getElementById('llanera-grd').innerHTML = generarHtmlPrecio(filas[4][5], filas[4][4]); [1]
-
-                // Fila Inferior (Arepas 5 a 8) [1]
-                document.getElementById('jamon-med').innerHTML = generarHtmlPrecio(filas[5][3], filas[5][2]); [1]
-                document.getElementById('jamon-grd').innerHTML = generarHtmlPrecio(filas[5][5], filas[5][4]); [1]
-                
-                document.getElementById('pelua-med').innerHTML = generarHtmlPrecio(filas[6][3], filas[6][2]); [1]
-                document.getElementById('pelua-grd').innerHTML = generarHtmlPrecio(filas[6][5], filas[6][4]); [1]
-                
-                document.getElementById('pernil-med').innerHTML = generarHtmlPrecio(filas[7][3], filas[7][2]); [1]
-                document.getElementById('pernil-grd').innerHTML = generarHtmlPrecio(filas[7][5], filas[7][4]); [1]
-                
-                document.getElementById('pabellon-med').innerHTML = generarHtmlPrecio(filas[8][3], filas[8][2]); [1]
-                document.getElementById('pabellon-grd').innerHTML = generarHtmlPrecio(filas[8][5], filas[8][4]); [1]
-
-            } catch (error) {
-                console.error("Error al sincronizar con las celdas de Google Sheets:", error);
+            } catch (err) {
+                console.error("Error sincronizando precios:", err);
             }
         }
 
-        actualizarCarteleraDigital();
-        // Ciclo automático cada 15 minutos para refrescar montos en pantalla sin reiniciar la app
-        setInterval(actualizarCarteleraDigital, 900000);
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchMenuData();
+            setInterval(fetchMenuData, SYNC_INTERVAL);
+        });
     </script>
 </body>
 </html>
-

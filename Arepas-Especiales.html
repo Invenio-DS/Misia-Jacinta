@@ -19,14 +19,14 @@
             --fuente-bcv: 'Montserrat', sans-serif;
 
             /* Tamaños de los precios de las Arepas (en vw para escalar con la pantalla) */
-            --tamano-precio-ref: 0.90vw; 
-            --tamano-precio-bs:  1.00vw;
-            --tamano-etiqueta:   0.80vw;  /* "Ref:" y "Bs." */
+            --tamano-precio-ref: 0.85vw; 
+            --tamano-precio-bs:  0.80vw;
+            --tamano-etiqueta:   0.65vw;  /* "Ref:" y "Bs." */
 
             /* Tamaños dentro de la tarjeta flotante BCV */
-            --tamano-bcv-titulo: 0.90vw;
-            --tamano-bcv-monto:  1.30vw;
-            --tamano-bcv-unidad: 0.90vw; /* "Bs./USD" */
+            --tamano-bcv-titulo: 0.70vw;
+            --tamano-bcv-monto:  1.15vw;
+            --tamano-bcv-unidad: 0.70vw; /* "Bs./USD" */
             --tamano-bcv-fecha:  0.75vw;
         }
 
@@ -69,7 +69,7 @@
             top: 2.8%;
             right: 2.5%;
             background: #ffffff;
-            border: 2.5px solid #200a5e; /* Borde oficial azul oscuro/morado */
+            border: 2.5px solid #200a5e;
             border-radius: 14px;
             box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
             display: flex;
@@ -152,7 +152,6 @@
             z-index: 10;
         }
 
-        /* Cada tamaño: Mediana y Grande */
         .size-box {
             width: 48%;
             display: flex;
@@ -162,7 +161,6 @@
             padding-left: 2px;
         }
 
-        /* Fila con el símbolo y el monto pegados en flujo dinámico */
         .price-line {
             display: inline-flex;
             align-items: baseline;
@@ -172,7 +170,7 @@
         }
 
         .price-ref {
-            color: #7c2d00; /* Legible sobre el recuadro amarillo */
+            color: #7c2d00;
             font-size: var(--tamano-precio-ref);
             font-weight: 900;
         }
@@ -191,22 +189,22 @@
         }
 
         /* Posiciones exactas Fila 1 (Arriba) */
-        #arepa-0 { left: 08.2%;  top: 50.0%; } /* Reina */
-        #arepa-1 { left: 33.2%; top: 50.0%; } /* Sifrina */
-        #arepa-2 { left: 57.6%; top: 50.0%; } /* Catira */
-        #arepa-3 { left: 82.0%; top: 50.0%; } /* Llanera */
+        #arepa-0 { left: 08.2%; top: 50.0%; } /* Reina */
+        #arepa-1 { left: 33.0%; top: 50.0%; } /* Sifrina */
+        #arepa-2 { left: 57.3%; top: 50.0%; } /* Catira */
+        #arepa-3 { left: 81.8%; top: 50.0%; } /* Llanera */
 
         /* Posiciones exactas Fila 2 (Abajo) */
-        #arepa-4 { left: 08.2%;  top: 86.5%; } /* Jamón y Queso */
-        #arepa-5 { left: 33.2%; top: 86.5%; } /* Pelúa */
-        #arepa-6 { left: 57.6%; top: 86.5%; } /* Pérnil */
-        #arepa-7 { left: 82.0%; top: 86.5%; } /* Pabellón */
+        #arepa-4 { left: 08.2%; top: 86.5%; } /* Jamón y Queso */
+        #arepa-5 { left: 33.0%; top: 86.5%; } /* Pelúa */
+        #arepa-6 { left: 57.3%; top: 86.5%; } /* Pérnil */
+        #arepa-7 { left: 81.8%; top: 86.5%; } /* Pabellón */
     </style>
 </head>
 <body>
 
     <div id="tv-canvas">
-        <!-- TARJETA BCV FLOTANTE OFICIAL CON LOGO GITHUB -->
+        <!-- TARJETA BCV FLOTANTE OFICIAL -->
         <div id="bcv-card">
             <div class="bcv-logo-wrapper">
                 <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
@@ -222,7 +220,6 @@
         </div>
 
         <!-- 8 AREPAS: MEDIANA Y GRANDE -->
-        <!-- Fila 1 -->
         <div class="arepa-slot" id="arepa-0">
             <div class="size-box">
                 <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
@@ -267,7 +264,6 @@
             </div>
         </div>
 
-        <!-- Fila 2 -->
         <div class="arepa-slot" id="arepa-4">
             <div class="size-box">
                 <div class="price-line price-ref"><span class="lbl">Ref:</span><span class="v-ref-m">0,00</span></div>
@@ -314,10 +310,9 @@
     </div>
 
     <script>
-        // URLs de sincronización
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
-        const SYNC_INTERVAL = 3600000; // 1 Hora
+        const SYNC_INTERVAL = 3600000;
 
         function parseCSVLine(line) {
             const result = [];
@@ -334,7 +329,7 @@
             return result;
         }
 
-        // Intérprete inteligente de cadenas numéricas con puntos o comas
+        // Parser para precios normales (Precios del menú en Ref y Bs)
         function parseCustomFloat(val) {
             if (!val) return 0;
             let str = String(val).trim();
@@ -342,11 +337,6 @@
                 str = str.replace(/\./g, '').replace(',', '.');
             } else if (str.includes(',')) {
                 str = str.replace(',', '.');
-            } else if (str.includes('.')) {
-                const parts = str.split('.');
-                if (parts[parts.length - 1].length > 2) {
-                    str = str.replace(/\./g, '');
-                }
             }
             let n = parseFloat(str.replace(/[^\d.-]/g, ''));
             return isNaN(n) ? 0 : n;
@@ -358,9 +348,18 @@
             return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        function formatPrice4(val) {
-            let n = parseCustomFloat(val);
-            if (n === 0) return "0,0000";
+        // Formateador exclusivo para la Tasa BCV (Garantiza 4 decimales sin alterar decimales)
+        function formatBCVRate(val) {
+            if (!val) return "0,0000";
+            let str = String(val).trim();
+            
+            // Si viene con coma (ej: "849,5640"), la pasa a punto para JS
+            if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            
+            let n = parseFloat(str);
+            if (isNaN(n) || n === 0) return "0,0000";
             return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
         }
 
@@ -372,7 +371,6 @@
             return `${d}/${m}/${y}`;
         }
 
-        // Consulta de precios de las Arepas desde Google Sheets
         async function fetchMenuData() {
             try {
                 const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
@@ -381,7 +379,6 @@
 
                 if (lines.length < 2) return;
 
-                // Mapeo de las 8 arepas a partir de la fila 2 del CSV (índice 1)
                 for (let i = 0; i < 8; i++) {
                     const lineIdx = i + 1;
                     if (!lines[lineIdx]) break;
@@ -390,10 +387,6 @@
                     const slot = document.getElementById(`arepa-${i}`);
                     if (!slot) continue;
 
-                    // Columna C (índice 2) = Ref Mediana
-                    // Columna D (índice 3) = Bs Mediana
-                    // Columna E (índice 4) = Ref Grande
-                    // Columna F (índice 5) = Bs Grande
                     slot.querySelector('.v-ref-m').innerText = formatPrice(cols[2]);
                     slot.querySelector('.v-bs-m').innerText  = formatPrice(cols[3]);
                     slot.querySelector('.v-ref-g').innerText = formatPrice(cols[4]);
@@ -404,7 +397,6 @@
             }
         }
 
-        // Consulta de la Tasa Oficial BCV desde tasa.json en GitHub
         async function fetchTasaBCV() {
             try {
                 const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
@@ -412,10 +404,8 @@
                 
                 const data = await response.json();
 
-                // Busca la tasa soportando estructuras directas o anidadas
                 let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
                 if (!rawTasa && typeof data === 'object') {
-                    // Si viene como lista o propiedades no estándar, busca el primer valor numérico
                     const keys = Object.keys(data);
                     for (let k of keys) {
                         if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
@@ -425,21 +415,18 @@
                     }
                 }
 
-                // Busca la fecha en el JSON o aplica la fecha actual del sistema
                 let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
 
                 if (rawTasa) {
-                    const formattedRate = formatPrice4(rawTasa);
+                    const formattedRate = formatBCVRate(rawTasa);
                     document.getElementById('val-bcv').innerText = formattedRate;
                     document.getElementById('val-fecha').innerText = rawFecha;
 
-                    // Guarda en caché local de contingencia
                     localStorage.setItem('cached_tasa_bcv', formattedRate);
                     localStorage.setItem('cached_fecha_bcv', rawFecha);
                 }
             } catch (err) {
                 console.error("Error obteniendo tasa desde JSON:", err);
-                // Si falla la red, carga el último valor registrado en el TV
                 const cachedRate = localStorage.getItem('cached_tasa_bcv');
                 const cachedDate = localStorage.getItem('cached_fecha_bcv');
                 if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
@@ -450,11 +437,9 @@
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('val-fecha').innerText = getTodayFormatted();
             
-            // Cargas iniciales
             fetchMenuData();
             fetchTasaBCV();
 
-            // Intervalos de actualización automática
             setInterval(fetchMenuData, SYNC_INTERVAL);
             setInterval(fetchTasaBCV, SYNC_INTERVAL);
         });

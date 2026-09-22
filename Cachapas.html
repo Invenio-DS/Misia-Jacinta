@@ -1,0 +1,413 @@
+quiero adaptar un html <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misia Jacinta - Cachapas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================================
+           1. CARGA DE FUENTE AVENIR-SEMIBOLD
+           ========================================================= */
+        @font-face {
+            font-family: 'Avenir-SemiBold';
+            src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        /* =========================================================
+           2. CONFIGURACIÓN CENTRAL DE TIPOGRAFÍAS Y TAMAÑOS
+           ========================================================= */
+        :root {
+            --fuente-precios: 'Avenir-SemiBold', sans-serif;
+            --fuente-bcv: 'Montserrat', sans-serif;
+
+            --tamano-precio-ref: 1.55vw; 
+            --tamano-precio-bs:  1.45vw;
+            --tamano-etiqueta:   0.85vw;  /* "REF:" y "Bs." */
+
+            --tamano-bcv-titulo: 0.80vw;
+            --tamano-bcv-monto:  1.20vw;
+            --tamano-bcv-unidad: 0.75vw;
+            --tamano-bcv-fecha:  0.75vw;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--fuente-precios);
+        }
+
+        /* Canvas horizontal 16:9 sincronizado al tamaño de la pantalla */
+        #tv-canvas {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        /* Video de fondo a pantalla completa */
+        #video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* =========================================================
+           TARJETA FLOTANTE BCV OFICIAL
+           ========================================================= */
+        #bcv-card {
+            position: absolute;
+            top: 2.8%;
+            right: 2.5%;
+            background: #ffffff;
+            border: 2.5px solid #200a5e;
+            border-radius: 14px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 10px;
+            gap: 12px;
+            z-index: 50;
+            font-family: var(--fuente-bcv);
+        }
+
+        .bcv-logo-wrapper {
+            width: 3.4vw;
+            height: 3.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bcv-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .bcv-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .bcv-title {
+            font-size: var(--tamano-bcv-titulo);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bcv-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0;
+        }
+
+        .bcv-rate {
+            font-size: var(--tamano-bcv-monto);
+            font-weight: 900;
+            color: #000000;
+            font-family: var(--fuente-precios);
+            display: inline-block;
+        }
+
+        .bcv-unit {
+            font-size: var(--tamano-bcv-unidad);
+            font-weight: 700;
+            color: #4a4a4a;
+        }
+
+        .bcv-date {
+            font-size: var(--tamano-bcv-fecha);
+            font-weight: 700;
+            color: #111111;
+            font-family: var(--fuente-precios);
+        }
+
+        /* =========================================================
+           SLOT DE PRECIOS CENTRAL (CALIBRADO AL RECUADRO DEL VIDEO)
+           ========================================================= */
+        #cachapa-slot {
+            position: absolute;
+            left: 41.5%;
+            top: 72.8%;
+            width: 25.5%;
+            height: 8.5%;
+            display: flex;
+            justify-content: space-between;
+            gap: 1.2vw;
+            z-index: 10;
+            opacity: 0; /* Oculto por defecto, aparece con el video */
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .size-box {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 2px;
+        }
+
+        .price-line {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            white-space: nowrap;
+            line-height: 1.4;
+        }
+
+        .price-ref {
+            color: #7c2d00;
+            font-size: var(--tamano-precio-ref);
+            font-weight: 700;
+        }
+
+        .price-bs {
+            color: #ffffff;
+            font-size: var(--tamano-precio-bs);
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+        }
+
+        .lbl {
+            font-size: var(--tamano-etiqueta);
+            font-weight: 700;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tv-canvas">
+        <!-- VIDEO DE FONDO -->
+        <video id="video-bg" autoplay muted loop playsinline>
+            <!-- REEMPLAZA ESTE ENLACE POR EL ENLACE DIRECTO RAW DE TU VIDEO -->
+            <source src="https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Cachapas.mp4" type="video/mp4">
+        </video>
+
+        <!-- TARJETA BCV FLOTANTE -->
+        <div id="bcv-card">
+            <div class="bcv-logo-wrapper">
+                <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
+            </div>
+            <div class="bcv-details">
+                <span class="bcv-title">TASA BCV OFICIAL</span>
+                <div class="bcv-price-row">
+                    <span class="bcv-rate" id="val-bcv">0,0000</span>
+                    <span class="bcv-unit">Bs./USD</span>
+                </div>
+                <span class="bcv-date" id="val-fecha">--/--/----</span>
+            </div>
+        </div>
+
+        <!-- RECUADRO ÚNICO CENTRAL DE PRECIOS (SIN ZOOM OUT) -->
+        <div id="cachapa-slot">
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref-m">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-bs-m">0,00</span></div>
+            </div>
+            <div class="size-box">
+                <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref-g">0,00</span></div>
+                <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-bs-g">0,00</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
+        const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
+        const SYNC_INTERVAL = 3600000;
+
+        let cachapasPrecios = [];
+
+        // TIMING EXACTO DEL VIDEO PARA CADA CACHAPA (en segundos)
+        const TIMELINE = [
+            { start: 3.5,  end: 9.0,  index: 0 }, // Queso de mano
+            { start: 9.5,  end: 15.0, index: 1 }, // Doble queso
+            { start: 15.5, end: 21.0, index: 2 }, // Jamón y queso
+            { start: 21.5, end: 27.0, index: 3 }, // Mechada y queso
+            { start: 27.5, end: 34.0, index: 4 }  // Pernil y queso
+        ];
+
+        function parseCSVLine(line) {
+            const result = [];
+            let curValue = "";
+            let inQuotes = false;
+            for (let char of line) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) {
+                    result.push(curValue);
+                    curValue = "";
+                } else curValue += char;
+            }
+            result.push(curValue);
+            return result;
+        }
+
+        function parseCustomFloat(val) {
+            if (!val) return 0;
+            let str = String(val).trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            let n = parseFloat(str.replace(/[^\d.-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatPrice(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,00";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatBCVRate(val) {
+            if (!val) return "0,0000";
+            let str = String(val).trim();
+            if (str.includes(',')) str = str.replace(',', '.');
+            let n = parseFloat(str);
+            if (isNaN(n) || n === 0) return "0,0000";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        function getTodayFormatted() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        async function fetchMenuData() {
+            try {
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
+
+                if (lines.length < 2) return;
+
+                cachapasPrecios = [];
+                // Carga las filas (a partir de la fila 2 del CSV)
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCSVLine(lines[i]);
+                    cachapasPrecios.push({
+                        refM: formatPrice(cols[2]),
+                        bsM:  formatPrice(cols[3]),
+                        refG: formatPrice(cols[4]),
+                        bsG:  formatPrice(cols[5])
+                    });
+                }
+            } catch (err) {
+                console.error("Error sincronizando menú:", err);
+            }
+        }
+
+        async function fetchTasaBCV() {
+            try {
+                const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error("Error obteniendo tasa.json");
+                
+                const data = await response.json();
+                let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
+                if (!rawTasa && typeof data === 'object') {
+                    for (let k of Object.keys(data)) {
+                        if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
+                            rawTasa = data[k];
+                            break;
+                        }
+                    }
+                }
+
+                let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
+
+                if (rawTasa) {
+                    const formattedRate = formatBCVRate(rawTasa);
+                    document.getElementById('val-bcv').innerText = formattedRate;
+                    document.getElementById('val-fecha').innerText = rawFecha;
+
+                    localStorage.setItem('cached_tasa_bcv', formattedRate);
+                    localStorage.setItem('cached_fecha_bcv', rawFecha);
+                }
+            } catch (err) {
+                const cachedRate = localStorage.getItem('cached_tasa_bcv');
+                const cachedDate = localStorage.getItem('cached_fecha_bcv');
+                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
+                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
+            }
+        }
+
+        // =========================================================
+        // CONTROLADOR DE TIEMPO DEL VIDEO (SIN ZOOM OUT)
+        // =========================================================
+        const video = document.getElementById('video-bg');
+        const priceSlot = document.getElementById('cachapa-slot');
+        const elRefM = document.getElementById('v-ref-m');
+        const elBsM  = document.getElementById('v-bs-m');
+        const elRefG = document.getElementById('v-ref-g');
+        const elBsG  = document.getElementById('v-bs-g');
+
+        let lastIndex = -1;
+
+        video.addEventListener('timeupdate', () => {
+            const currentTime = video.currentTime;
+            
+            // Busca si el tiempo actual coincide con alguna cachapa
+            const match = TIMELINE.find(item => currentTime >= item.start && currentTime <= item.end);
+
+            if (match && cachapasPrecios[match.index]) {
+                if (lastIndex !== match.index) {
+                    const data = cachapasPrecios[match.index];
+                    elRefM.innerText = data.refM;
+                    elBsM.innerText  = data.bsM;
+                    elRefG.innerText = data.refG;
+                    elBsG.innerText  = data.bsG;
+                    lastIndex = match.index;
+                }
+                priceSlot.style.opacity = '1';
+            } else {
+                priceSlot.style.opacity = '0';
+                lastIndex = -1;
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('val-fecha').innerText = getTodayFormatted();
+            fetchMenuData();
+            fetchTasaBCV();
+
+            setInterval(fetchMenuData, SYNC_INTERVAL);
+            setInterval(fetchTasaBCV, SYNC_INTERVAL);
+        });
+    </script>
+</body>
+</html>

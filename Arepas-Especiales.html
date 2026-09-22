@@ -72,24 +72,18 @@
         }
 
         /* =========================================================
-           ANIMACIÓN ZOOM OUT
+           ANIMACIÓN ZOOM IN / OUT REPETITIVA E INFINITA
            ========================================================= */
-        @keyframes zoomOutPrice {
+        @keyframes pulseZoom {
             0% {
-                transform: scale(1.20);
-                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3); /* Suave incremento para no invadir márgenes */
             }
             100% {
                 transform: scale(1);
-                opacity: 1;
             }
-        }
-
-        .zoom-anim {
-            display: inline-block;
-            transform-origin: left center;
-            animation: zoomOutPrice 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            will-change: transform, opacity;
         }
 
         /* =========================================================
@@ -157,6 +151,9 @@
             color: #000000;
             font-family: var(--fuente-precios);
             display: inline-block;
+            transform-origin: left center;
+            animation: pulseZoom 3.5s ease-in-out infinite;
+            will-change: transform;
         }
 
         .bcv-unit {
@@ -200,6 +197,9 @@
             gap: 3px;
             white-space: nowrap;
             line-height: 1.4;
+            transform-origin: left center;
+            animation: pulseZoom 3.5s ease-in-out infinite;
+            will-change: transform;
         }
 
         .price-ref {
@@ -347,13 +347,6 @@
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 3600000;
 
-        function triggerZoom(element) {
-            if (!element) return;
-            element.classList.remove('zoom-anim');
-            void element.offsetWidth; // Fuerza el reflujo para reiniciar la animación
-            element.classList.add('zoom-anim');
-        }
-
         function parseCSVLine(line) {
             const result = [];
             let curValue = "";
@@ -422,20 +415,10 @@
                     const slot = document.getElementById(`arepa-${i}`);
                     if (!slot) continue;
 
-                    const elRefM = slot.querySelector('.v-ref-m');
-                    const elBsM  = slot.querySelector('.v-bs-m');
-                    const elRefG = slot.querySelector('.v-ref-g');
-                    const elBsG  = slot.querySelector('.v-bs-g');
-
-                    elRefM.innerText = formatPrice(cols[2]);
-                    elBsM.innerText  = formatPrice(cols[3]);
-                    elRefG.innerText = formatPrice(cols[4]);
-                    elBsG.innerText  = formatPrice(cols[5]);
-
-                    triggerZoom(elRefM);
-                    triggerZoom(elBsM);
-                    triggerZoom(elRefG);
-                    triggerZoom(elBsG);
+                    slot.querySelector('.v-ref-m').innerText = formatPrice(cols[2]);
+                    slot.querySelector('.v-bs-m').innerText  = formatPrice(cols[3]);
+                    slot.querySelector('.v-ref-g').innerText = formatPrice(cols[4]);
+                    slot.querySelector('.v-bs-g').innerText  = formatPrice(cols[5]);
                 }
             } catch (err) {
                 console.error("Error sincronizando menú:", err);
@@ -464,11 +447,8 @@
 
                 if (rawTasa) {
                     const formattedRate = formatBCVRate(rawTasa);
-                    const bcvElem = document.getElementById('val-bcv');
-                    bcvElem.innerText = formattedRate;
+                    document.getElementById('val-bcv').innerText = formattedRate;
                     document.getElementById('val-fecha').innerText = rawFecha;
-
-                    triggerZoom(bcvElem);
 
                     localStorage.setItem('cached_tasa_bcv', formattedRate);
                     localStorage.setItem('cached_fecha_bcv', rawFecha);

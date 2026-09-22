@@ -72,6 +72,27 @@
         }
 
         /* =========================================================
+           ANIMACIÓN ZOOM OUT
+           ========================================================= */
+        @keyframes zoomOutPrice {
+            0% {
+                transform: scale(1.20);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .zoom-anim {
+            display: inline-block;
+            transform-origin: left center;
+            animation: zoomOutPrice 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: transform, opacity;
+        }
+
+        /* =========================================================
            TARJETA FLOTANTE BCV OFICIAL
            ========================================================= */
         #bcv-card {
@@ -135,6 +156,7 @@
             font-weight: 900;
             color: #000000;
             font-family: var(--fuente-precios);
+            display: inline-block;
         }
 
         .bcv-unit {
@@ -325,6 +347,13 @@
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 3600000;
 
+        function triggerZoom(element) {
+            if (!element) return;
+            element.classList.remove('zoom-anim');
+            void element.offsetWidth; // Fuerza el reflujo para reiniciar la animación
+            element.classList.add('zoom-anim');
+        }
+
         function parseCSVLine(line) {
             const result = [];
             let curValue = "";
@@ -393,10 +422,20 @@
                     const slot = document.getElementById(`arepa-${i}`);
                     if (!slot) continue;
 
-                    slot.querySelector('.v-ref-m').innerText = formatPrice(cols[2]);
-                    slot.querySelector('.v-bs-m').innerText  = formatPrice(cols[3]);
-                    slot.querySelector('.v-ref-g').innerText = formatPrice(cols[4]);
-                    slot.querySelector('.v-bs-g').innerText  = formatPrice(cols[5]);
+                    const elRefM = slot.querySelector('.v-ref-m');
+                    const elBsM  = slot.querySelector('.v-bs-m');
+                    const elRefG = slot.querySelector('.v-ref-g');
+                    const elBsG  = slot.querySelector('.v-bs-g');
+
+                    elRefM.innerText = formatPrice(cols[2]);
+                    elBsM.innerText  = formatPrice(cols[3]);
+                    elRefG.innerText = formatPrice(cols[4]);
+                    elBsG.innerText  = formatPrice(cols[5]);
+
+                    triggerZoom(elRefM);
+                    triggerZoom(elBsM);
+                    triggerZoom(elRefG);
+                    triggerZoom(elBsG);
                 }
             } catch (err) {
                 console.error("Error sincronizando menú:", err);
@@ -425,8 +464,11 @@
 
                 if (rawTasa) {
                     const formattedRate = formatBCVRate(rawTasa);
-                    document.getElementById('val-bcv').innerText = formattedRate;
+                    const bcvElem = document.getElementById('val-bcv');
+                    bcvElem.innerText = formattedRate;
                     document.getElementById('val-fecha').innerText = rawFecha;
+
+                    triggerZoom(bcvElem);
 
                     localStorage.setItem('cached_tasa_bcv', formattedRate);
                     localStorage.setItem('cached_fecha_bcv', rawFecha);

@@ -18,7 +18,7 @@ quiero adaptar un html <!DOCTYPE html>
         }
 
         /* =========================================================
-           2. CONFIGURACI”N CENTRAL DE TIPOGRAFÕAS Y TAMA—OS
+           2. CONFIGURACI√ìN CENTRAL DE TIPOGRAF√çAS Y TAMA√ëOS
            ========================================================= */
         :root {
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
@@ -51,7 +51,7 @@ quiero adaptar un html <!DOCTYPE html>
             font-family: var(--fuente-precios);
         }
 
-        /* Canvas horizontal 16:9 sincronizado al tamaÒo de la pantalla */
+        /* Canvas horizontal 16:9 sincronizado al tama√±o de la pantalla */
         #tv-canvas {
             position: relative;
             width: 100vw;
@@ -229,7 +229,7 @@ quiero adaptar un html <!DOCTYPE html>
             </div>
         </div>
 
-        <!-- RECUADRO ⁄NICO CENTRAL DE PRECIOS (SIN ZOOM OUT) -->
+        <!-- RECUADRO √öNICO CENTRAL DE PRECIOS (SIN ZOOM OUT) -->
         <div id="cachapa-slot">
             <div class="size-box">
                 <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref-m">0,00</span></div>
@@ -243,7 +243,7 @@ quiero adaptar un html <!DOCTYPE html>
     </div>
 
     <script>
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1337042564&single=true&output=csv";
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 3600000;
 
@@ -251,11 +251,11 @@ quiero adaptar un html <!DOCTYPE html>
 
         // TIMING EXACTO DEL VIDEO PARA CADA CACHAPA (en segundos)
         const TIMELINE = [
-            { start: 3.5,  end: 9.0,  index: 0 }, // Queso de mano
-            { start: 9.5,  end: 15.0, index: 1 }, // Doble queso
-            { start: 15.5, end: 21.0, index: 2 }, // JamÛn y queso
-            { start: 21.5, end: 27.0, index: 3 }, // Mechada y queso
-            { start: 27.5, end: 34.0, index: 4 }  // Pernil y queso
+            { start: 3.6,  end: 7.9,  index: 0 }, // Queso de mano
+            { start: 8.9,  end: 14.3, index: 1 }, // Doble queso
+            { start: 15.0, end: 21.3, index: 2 }, // Jam√≥n y queso
+            { start: 22.2, end: 27.9, index: 3 }, // Mechada y queso
+            { start: 28.5, end: 34.0, index: 4 }  // Pernil y queso
         ];
 
         function parseCSVLine(line) {
@@ -328,7 +328,7 @@ quiero adaptar un html <!DOCTYPE html>
                     });
                 }
             } catch (err) {
-                console.error("Error sincronizando men˙:", err);
+                console.error("Error sincronizando men√∫:", err);
             }
         }
 

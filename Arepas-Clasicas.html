@@ -25,9 +25,9 @@
             --fuente-bcv: 'Montserrat', sans-serif;
 
             /* Tamaños dentro de los 3 slots */
-            --tamano-precio-ref: 1.25vw; 
-            --tamano-precio-bs:  1.15vw;
-            --tamano-etiqueta:   0.75vw;  /* "REF:" y "Bs." */
+            --tamano-precio-ref: 1.50vw; 
+            --tamano-precio-bs:  1.80vw;
+            --tamano-etiqueta:   0.90vw;  /* "REF:" y "Bs." */
 
             --tamano-bcv-titulo: 0.80vw;
             --tamano-bcv-monto:  1.20vw;
@@ -152,7 +152,7 @@
         }
 
         /* =========================================================
-           CONFIGURACIÓN INDIVIDUAL DE CADA SLOT (CORRECCIÓN VERTICAL)
+           CONFIGURACIÓN DE SLOTS SOBRE LA MESA
            ========================================================= */
         .arepa-slot {
             position: absolute;
@@ -166,22 +166,19 @@
             transition: opacity 0.35s ease-in-out;
         }
 
-        /* Izquierda: Altura estándar */
         #slot-left {
-            left: 11.8%;
-            top: 73.2%;
+            left: 12.8%;
+            top: 75.2%;
         }
 
-        /* Centro: Se ajusta más abajo (74.8%) para alinearse con el recuadro central */
         #slot-center {
-            left: 41.2%;
-            top: 74.8%;
+            left: 45.2%;
+            top: 72.8%;
         }
 
-        /* Derecha: Altura estándar */
         #slot-right {
-            left: 70.4%;
-            top: 73.2%;
+            left: 75.4%;
+            top: 75.2%;
         }
 
         .size-box {
@@ -289,10 +286,11 @@
 
         let arepasClasicas = [];
 
+        // Fases de rotación del video (Izquierda, Centro, Derecha)
         const ROTACIONES = [
-            { start: 2.5,  end: 7.5,  left: 0, center: 1, right: 2 },
-            { start: 8.5,  end: 13.5, left: 3, center: 0, right: 1 },
-            { start: 14.5, end: 19.5, left: 2, center: 3, right: 0 }
+            { start: 2.5,  end: 7.5,  left: 0, center: 1, right: 2 }, // Mechada, Pollo, Jamón
+            { start: 8.5,  end: 13.5, left: 3, center: 0, right: 1 }, // Queso Plancha, Mechada, Pollo
+            { start: 14.5, end: 19.5, left: 2, center: 3, right: 0 }  // Jamón, Queso Plancha, Mechada
         ];
 
         function parseCSVLine(line) {
@@ -345,6 +343,9 @@
             return `${d}/${m}/${y}`;
         }
 
+        // =========================================================
+        // LECTURA DE COLUMNAS D, E, F, G (FILAS 4 A 7)
+        // =========================================================
         async function fetchMenuData() {
             try {
                 const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
@@ -355,16 +356,18 @@
 
                 arepasClasicas = [];
 
+                // r = 3 (Fila 4: Mechada)
+                // r = 4 (Fila 5: Pollo)
+                // r = 5 (Fila 6: Jamón)
+                // r = 6 (Fila 7: Queso a la Plancha)
                 for (let r = 3; r <= 6; r++) {
                     const cols = parseCSVLine(lines[r]);
-                    const refVal = formatPrice(cols[3]); // Columna D
-                    const bsVal  = formatPrice(cols[5]); // Columna F
 
                     arepasClasicas.push({
-                        refM: refVal,
-                        bsM:  bsVal,
-                        refG: refVal,
-                        bsG:  bsVal
+                        refM: formatPrice(cols[3]), // Columna D (Índice 3) -> Mediana REF
+                        bsM:  formatPrice(cols[4]), // Columna E (Índice 4) -> Mediana Bs
+                        refG: formatPrice(cols[5]), // Columna F (Índice 5) -> Grande REF
+                        bsG:  formatPrice(cols[6])  // Columna G (Índice 6) -> Grande Bs
                     });
                 }
             } catch (err) {

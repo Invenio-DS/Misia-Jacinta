@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misia Jacinta - Arepas Cl·sicas</title>
+    <title>Misia Jacinta - Arepas Cl√°sicas</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -18,13 +18,13 @@
         }
 
         /* =========================================================
-           2. CONFIGURACI”N CENTRAL DE TIPOGRAFÕAS Y TAMA—OS
+           2. CONFIGURACI√ìN CENTRAL DE TIPOGRAF√çAS Y TAMA√ëOS
            ========================================================= */
         :root {
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
             --fuente-bcv: 'Montserrat', sans-serif;
 
-            /* TamaÒos dentro de los 3 slots */
+            /* Tama√±os dentro de los 3 slots */
             --tamano-precio-ref: 1.25vw; 
             --tamano-precio-bs:  1.15vw;
             --tamano-etiqueta:   0.75vw;  /* "REF:" y "Bs." */
@@ -152,25 +152,37 @@
         }
 
         /* =========================================================
-           LOS 3 RECUADROS DE PRECIOS SOBRE LA MESA (SIN ZOOM OUT)
+           CONFIGURACI√ìN INDIVIDUAL DE CADA SLOT (CORRECCI√ìN VERTICAL)
            ========================================================= */
         .arepa-slot {
             position: absolute;
-            top: 73.2%;
             width: 19.5%;
             height: 7.0%;
             display: flex;
             justify-content: space-between;
             gap: 0.8vw;
             z-index: 10;
-            opacity: 0; /* Controlado por el video */
+            opacity: 0;
             transition: opacity 0.35s ease-in-out;
         }
 
-        /* Posiciones horizontales de los 3 platos */
-        #slot-left   { left: 11.8%; }
-        #slot-center { left: 41.2%; }
-        #slot-right  { left: 70.4%; }
+        /* Izquierda: Altura est√°ndar */
+        #slot-left {
+            left: 11.8%;
+            top: 73.2%;
+        }
+
+        /* Centro: Se ajusta m√°s abajo (74.8%) para alinearse con el recuadro central */
+        #slot-center {
+            left: 41.2%;
+            top: 74.8%;
+        }
+
+        /* Derecha: Altura est√°ndar */
+        #slot-right {
+            left: 70.4%;
+            top: 73.2%;
+        }
 
         .size-box {
             width: 48%;
@@ -232,7 +244,7 @@
             </div>
         </div>
 
-        <!-- 3 RECUADROS (IZQUIERDA, CENTRO, DERECHA) -->
+        <!-- 3 SLOTS INDEPENDIENTES -->
         <!-- Slot Izquierda -->
         <div class="arepa-slot" id="slot-left">
             <div class="size-box">
@@ -275,14 +287,12 @@
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 3600000;
 
-        // Array para almacenar las 4 arepas (Mechada=0, Pollo=1, JamÛn=2, Queso Plancha=3)
         let arepasClasicas = [];
 
-        // Fases de tiempo del video: QuÈ arepa va en Izquierda (L), Centro (C) y Derecha (R)
         const ROTACIONES = [
-            { start: 2.5,  end: 7.5,  left: 0, center: 1, right: 2 }, // Mechada, Pollo, JamÛn
-            { start: 8.5,  end: 13.5, left: 3, center: 0, right: 1 }, // Queso Plancha, Mechada, Pollo
-            { start: 14.5, end: 19.5, left: 2, center: 3, right: 0 }  // JamÛn, Queso Plancha, Mechada
+            { start: 2.5,  end: 7.5,  left: 0, center: 1, right: 2 },
+            { start: 8.5,  end: 13.5, left: 3, center: 0, right: 1 },
+            { start: 14.5, end: 19.5, left: 2, center: 3, right: 0 }
         ];
 
         function parseCSVLine(line) {
@@ -345,12 +355,6 @@
 
                 arepasClasicas = [];
 
-                // Fila 4 a 7 de Google Sheets = Õndices 3 a 6 del CSV
-                // Columna D = Õndice 3 (REF)
-                // Columna F = Õndice 5 (Bs)
-                // NOTA: Como la arepa cl·sica tiene un precio base y otro grande,
-                // si la hoja trae solo un monto, se coloca en ambos tamaÒos, 
-                // o si viene en columnas contiguas se asigna autom·ticamente.
                 for (let r = 3; r <= 6; r++) {
                     const cols = parseCSVLine(lines[r]);
                     const refVal = formatPrice(cols[3]); // Columna D
@@ -364,7 +368,7 @@
                     });
                 }
             } catch (err) {
-                console.error("Error cargando men˙ de arepas cl·sicas:", err);
+                console.error("Error cargando men√∫ de arepas cl√°sicas:", err);
             }
         }
 

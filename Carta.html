@@ -30,21 +30,21 @@
             --mostrar-titulo: none; 
             --fuente-titulo: 'Avenir-SemiBold', sans-serif;
             --tamano-titulo: 3.5vw;
-            --color-titulo: #462a18;
+            --color-titulo: #2b1810;
             --sombra-titulo: 2px 3px 6px rgba(0, 0, 0, 0.4);
             --posicion-top-titulo: 4%;
 
             /* === COLORES DE LA CARTA === */
-            --color-categoria: #f28c3d;
-            --color-plato: #462a18;
-            --color-precio-ref: #462a18;
-            --color-precio-bs: #f28c3d;
+            --color-categoria: #8a3b00;
+            --color-plato: #2b1810;
+            --color-precio-ref: #7c2d00;
+            --color-precio-bs: #c0392b;
 
             /* === TAMAÑOS DE LOS PRECIOS Y TEXTOS === */
-            --tamano-categoria: 1.21vw;
-            --tamano-plato: 1.15vw;
-            --tamano-precio: 1.15vw;
-            --tamano-etiqueta: 0.80vw;
+            --tamano-categoria: 1.15vw;
+            --tamano-plato: 0.95vw;
+            --tamano-precio: 0.95vw;
+            --tamano-etiqueta: 0.70vw;
 
             /* === TAMAÑOS DE LA TARJETA BCV === */
             --tamano-bcv-titulo: 0.80vw;
@@ -186,7 +186,7 @@
            ========================================================= */
         #menu-container {
             position: absolute;
-            top: 24%;
+            top: 18%;
             bottom: 6%;
             left: 6%;
             right: 6%;
@@ -201,7 +201,7 @@
         .menu-column {
             display: flex;
             flex-direction: column;
-            gap: 0.3vw; /* Ligeramente reducido para alojar 12 ítems */
+            gap: 0.6vw; /* Ligeramente reducido para alojar 12 ítems */
         }
 
         .category-title {
@@ -251,7 +251,7 @@
         }
 
         .price-box.ref {
-            color: #f28c3d;
+            color: var(--color-precio-ref);
         }
 
         .price-box.bs {
@@ -299,7 +299,7 @@
         
         // Configuraciones de Paginación
         const SYNC_INTERVAL = 300000; // Refresca datos cada 5 minutos
-        const PAGE_DURATION = 20000;  // Tiempo por página (20 segundos)
+        const PAGE_DURATION = 12000;  // Tiempo por página (12 segundos)
         const MAX_ITEMS_PER_COLUMN = 12; // 12 ítems por bloque (columna)
         const MAX_ITEMS_PER_PAGE = MAX_ITEMS_PER_COLUMN * 2; // 24 ítems totales por pantalla
 

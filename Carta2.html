@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misia Jacinta - Lista de Precios Carta</title>
-    <!-- ImportaciÛn de Fuentes complementarias -->
+    <!-- Importaci√≥n de Fuentes complementarias -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -19,7 +19,7 @@
         }
 
         /* =========================================================
-           2. VARIABLES GLOBALES DE DISE—O Y TIPOGRAFÕA
+           2. VARIABLES GLOBALES DE DISE√ëO Y TIPOGRAF√çA
            ========================================================= */
         :root {
             --fuente-principal: 'Avenir-SemiBold', sans-serif;
@@ -31,13 +31,13 @@
             --color-precio-ref: #7c2d00;
             --color-precio-bs: #c0392b;
 
-            /* TamaÒos relativos en vw para pantallas de TV */
+            /* Tama√±os relativos en vw para pantallas de TV */
             --tamano-categoria: 1.15vw;
-            --tamano-plato: 0.95vw;
-            --tamano-precio: 0.95vw;
-            --tamano-etiqueta: 0.70vw;
+            --tamano-plato: 1.05vw;
+            --tamano-precio: 1.05vw;
+            --tamano-etiqueta: 0.80vw;
 
-            /* TamaÒos de la tarjeta BCV */
+            /* Tama√±os de la tarjeta BCV */
             --tamano-bcv-titulo: 0.80vw;
             --tamano-bcv-monto:  1.20vw;
             --tamano-bcv-unidad: 0.75vw;
@@ -61,14 +61,14 @@
             font-family: var(--fuente-principal);
         }
 
-        /* Canvas horizontal est·ndar 16:9 */
+        /* Canvas horizontal est√°ndar 16:9 */
         #tv-canvas {
             position: relative;
             width: 100vw;
             height: 56.25vw;
             max-height: 100vh;
             max-width: 177.78vh;
-            background-image: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Fondo-Carta2.png');
+            background-image: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Fondo-Carta 2.png');
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -316,7 +316,7 @@
         }
 
         // =========================================================
-        // CARGA Y RENDERIZADO DEL MEN⁄ POR VALIDACI”N DE COLUMNA I
+        // CARGA Y RENDERIZADO DEL MEN√ö POR VALIDACI√ìN DE COLUMNA I
         // =========================================================
         async function fetchMenuData() {
             try {
@@ -328,12 +328,12 @@
 
                 const activeItems = [];
 
-                // Recorremos desde la fila 2 (Ìndice 1) en adelante
+                // Recorremos desde la fila 2 (√≠ndice 1) en adelante
                 for (let i = 1; i < lines.length; i++) {
                     const cols = parseCSVLine(lines[i]);
                     if (!cols || cols.length < 9) continue;
 
-                    // ValidaciÛn Columna I (Õndice 8)
+                    // Validaci√≥n Columna I (√çndice 8)
                     const valColI = String(cols[8] || "").toUpperCase().trim();
                     const isValid = valColI === "VERDADERO" || valColI === "TRUE" || valColI === "1";
 
@@ -347,7 +347,7 @@
                     }
                 }
 
-                // Limitamos a los primeros 16 Ìtems activos (8 y 8)
+                // Limitamos a los primeros 16 √≠tems activos (8 y 8)
                 const itemsToDisplay = activeItems.slice(0, 16);
                 const colLeftItems = itemsToDisplay.slice(0, 8);
                 const colRightItems = itemsToDisplay.slice(8, 16);
@@ -356,11 +356,11 @@
                 renderColumn("col-right", colRightItems);
 
             } catch (err) {
-                console.error("Error sincronizando men˙:", err);
+                console.error("Error sincronizando men√∫:", err);
             }
         }
 
-        // Renderiza cada columna agrupando por categorÌa
+        // Renderiza cada columna agrupando por categor√≠a
         function renderColumn(elementId, items) {
             const container = document.getElementById(elementId);
             container.innerHTML = "";

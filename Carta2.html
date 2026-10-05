@@ -35,7 +35,7 @@
             --posicion-top-titulo: 4%;
 
             /* === COLORES DE LA CARTA === */
-            --color-categoria: #f28c3d;
+            --color-categoria: #8a3b00;
             --color-plato: #462a18;
             --color-precio-ref: #462a18;
             --color-precio-bs: #f28c3d;
@@ -186,7 +186,7 @@
            ========================================================= */
         #menu-container {
             position: absolute;
-            top: 24%;
+            top: 18%;
             bottom: 6%;
             left: 6%;
             right: 6%;
@@ -201,7 +201,7 @@
         .menu-column {
             display: flex;
             flex-direction: column;
-            gap: 0.3vw; /* Ligeramente reducido para alojar 12 ítems */
+            gap: 0.4vw; /* Ligeramente reducido para alojar 12 ítems */
         }
 
         .category-title {
@@ -219,7 +219,7 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            padding: 0.25vw 0; /* Espaciado vertical optimizado para 12 filas */
+            padding: 0.21vw 0; /* Espaciado vertical optimizado para 12 filas */
             border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
         }
 
@@ -251,7 +251,7 @@
         }
 
         .price-box.ref {
-            color: #f28c3d;
+            color: var(--color-precio-ref);
         }
 
         .price-box.bs {

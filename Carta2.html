@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misia Jacinta - Lista de Precios Carta</title>
+    <!-- Importación de Fuentes complementarias -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================================
+           1. CARGA DE LA FUENTE AVENIR-SEMIBOLD
+           ========================================================= */
+        @font-face {
+            font-family: 'Avenir-SemiBold';
+            src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        /* =========================================================
+           2. VARIABLES GLOBALES DE DISEÑO Y TIPOGRAFÍA
+           ========================================================= */
+        :root {
+            --fuente-principal: 'Avenir-SemiBold', sans-serif;
+            --fuente-bcv: 'Montserrat', sans-serif;
+
+            /* Colores de la Carta */
+            --color-categoria: #8a3b00;
+            --color-plato: #2b1810;
+            --color-precio-ref: #7c2d00;
+            --color-precio-bs: #c0392b;
+
+            /* Tamaños relativos en vw para pantallas de TV */
+            --tamano-categoria: 1.15vw;
+            --tamano-plato: 0.95vw;
+            --tamano-precio: 0.95vw;
+            --tamano-etiqueta: 0.70vw;
+
+            /* Tamaños de la tarjeta BCV */
+            --tamano-bcv-titulo: 0.80vw;
+            --tamano-bcv-monto:  1.20vw;
+            --tamano-bcv-unidad: 0.75vw;
+            --tamano-bcv-fecha:  0.75vw;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--fuente-principal);
+        }
+
+        /* Canvas horizontal estándar 16:9 */
+        #tv-canvas {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-image: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Fondo-Carta2.png');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        /* =========================================================
+           TARJETA FLOTANTE BCV OFICIAL (ESQUINA SUPERIOR DERECHA)
+           ========================================================= */
+        #bcv-card {
+            position: absolute;
+            top: 2.8%;
+            right: 2.5%;
+            background: #ffffff;
+            border: 2.5px solid #200a5e;
+            border-radius: 14px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 10px;
+            gap: 12px;
+            z-index: 50;
+            font-family: var(--fuente-bcv);
+        }
+
+        .bcv-logo-wrapper {
+            width: 3.4vw;
+            height: 3.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bcv-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .bcv-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .bcv-title {
+            font-size: var(--tamano-bcv-titulo);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bcv-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0;
+        }
+
+        .bcv-rate {
+            font-size: var(--tamano-bcv-monto);
+            font-weight: 900;
+            color: #000000;
+            font-family: var(--fuente-principal);
+            display: inline-block;
+        }
+
+        .bcv-unit {
+            font-size: var(--tamano-bcv-unidad);
+            font-weight: 700;
+            color: #4a4a4a;
+        }
+
+        .bcv-date {
+            font-size: var(--tamano-bcv-fecha);
+            font-weight: 700;
+            color: #111111;
+            font-family: var(--fuente-principal);
+        }
+
+        /* =========================================================
+           CONTENEDOR MAESTRO DE PRODUCTOS (GRID EN 2 COLUMNAS)
+           ========================================================= */
+        #menu-container {
+            position: absolute;
+            top: 18%;
+            bottom: 6%;
+            left: 6%;
+            right: 6%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4vw;
+            z-index: 10;
+        }
+
+        .menu-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8vw;
+        }
+
+        .category-title {
+            font-size: var(--tamano-categoria);
+            color: var(--color-categoria);
+            text-transform: uppercase;
+            font-weight: 900;
+            border-bottom: 2px solid rgba(138, 59, 0, 0.3);
+            padding-bottom: 0.2vw;
+            margin-top: 0.4vw;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.35vw 0;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+        }
+
+        .item-info {
+            flex: 1;
+            padding-right: 1vw;
+        }
+
+        .item-name {
+            font-size: var(--tamano-plato);
+            color: var(--color-plato);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .item-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 1vw;
+            white-space: nowrap;
+        }
+
+        .price-box {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 2px;
+            font-size: var(--tamano-precio);
+            font-weight: 700;
+        }
+
+        .price-box.ref {
+            color: var(--color-precio-ref);
+        }
+
+        .price-box.bs {
+            color: var(--color-precio-bs);
+        }
+
+        .price-lbl {
+            font-size: var(--tamano-etiqueta);
+            font-weight: 600;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tv-canvas">
+        <!-- TARJETA BCV FLOTANTE OFICIAL -->
+        <div id="bcv-card">
+            <div class="bcv-logo-wrapper">
+                <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
+            </div>
+            <div class="bcv-details">
+                <span class="bcv-title">TASA BCV OFICIAL</span>
+                <div class="bcv-price-row">
+                    <span class="bcv-rate" id="val-bcv">0,0000</span>
+                    <span class="bcv-unit">Bs./USD</span>
+                </div>
+                <span class="bcv-date" id="val-fecha">--/--/----</span>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR EN 2 COLUMNAS (8 Y 8) -->
+        <div id="menu-container">
+            <div class="menu-column" id="col-left"></div>
+            <div class="menu-column" id="col-right"></div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1021186658&single=true&output=csv";
+        const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
+        const SYNC_INTERVAL = 3600000; // 1 Hora
+
+        function parseCSVLine(line) {
+            const result = [];
+            let curValue = "";
+            let inQuotes = false;
+            for (let char of line) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) {
+                    result.push(curValue);
+                    curValue = "";
+                } else curValue += char;
+            }
+            result.push(curValue);
+            return result;
+        }
+
+        function parseCustomFloat(val) {
+            if (!val) return 0;
+            let str = String(val).trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            let n = parseFloat(str.replace(/[^\d.-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatPrice(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,00";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatBCVRate(val) {
+            if (!val) return "0,0000";
+            let str = String(val).trim();
+            if (str.includes(',')) str = str.replace(',', '.');
+            let n = parseFloat(str);
+            if (isNaN(n) || n === 0) return "0,0000";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        function getTodayFormatted() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        // =========================================================
+        // CARGA Y RENDERIZADO DEL MENÚ POR VALIDACIÓN DE COLUMNA I
+        // =========================================================
+        async function fetchMenuData() {
+            try {
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
+
+                if (lines.length < 2) return;
+
+                const activeItems = [];
+
+                // Recorremos desde la fila 2 (índice 1) en adelante
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCSVLine(lines[i]);
+                    if (!cols || cols.length < 9) continue;
+
+                    // Validación Columna I (Índice 8)
+                    const valColI = String(cols[8] || "").toUpperCase().trim();
+                    const isValid = valColI === "VERDADERO" || valColI === "TRUE" || valColI === "1";
+
+                    if (isValid) {
+                        activeItems.push({
+                            categoria: cols[1]?.trim() || "VARIOS", // Columna B
+                            nombre: cols[2]?.trim() || "",           // Columna C
+                            ref: formatPrice(cols[4]),               // Columna E
+                            bs: formatPrice(cols[5])                 // Columna F
+                        });
+                    }
+                }
+
+                // Limitamos a los primeros 16 ítems activos (8 y 8)
+                const itemsToDisplay = activeItems.slice(0, 16);
+                const colLeftItems = itemsToDisplay.slice(0, 8);
+                const colRightItems = itemsToDisplay.slice(8, 16);
+
+                renderColumn("col-left", colLeftItems);
+                renderColumn("col-right", colRightItems);
+
+            } catch (err) {
+                console.error("Error sincronizando menú:", err);
+            }
+        }
+
+        // Renderiza cada columna agrupando por categoría
+        function renderColumn(elementId, items) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = "";
+
+            let lastCategory = "";
+
+            items.forEach(item => {
+                if (item.categoria !== lastCategory) {
+                    const catTitle = document.createElement("div");
+                    catTitle.className = "category-title";
+                    catTitle.innerText = item.categoria;
+                    container.appendChild(catTitle);
+                    lastCategory = item.categoria;
+                }
+
+                const row = document.createElement("div");
+                row.className = "menu-item-row";
+                row.innerHTML = `
+                    <div class="item-info">
+                        <span class="item-name">${item.nombre}</span>
+                    </div>
+                    <div class="item-prices">
+                        <div class="price-box ref">
+                            <span class="price-lbl">REF:</span>
+                            <span>${item.ref}</span>
+                        </div>
+                        <div class="price-box bs">
+                            <span class="price-lbl">Bs.</span>
+                            <span>${item.bs}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // =========================================================
+        // CONSULTA DE LA TASA OFICIAL BCV
+        // =========================================================
+        async function fetchTasaBCV() {
+            try {
+                const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error("Error obteniendo tasa.json");
+                
+                const data = await response.json();
+                let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
+                if (!rawTasa && typeof data === 'object') {
+                    for (let k of Object.keys(data)) {
+                        if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
+                            rawTasa = data[k];
+                            break;
+                        }
+                    }
+                }
+
+                let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
+
+                if (rawTasa) {
+                    const formattedRate = formatBCVRate(rawTasa);
+                    document.getElementById('val-bcv').innerText = formattedRate;
+                    document.getElementById('val-fecha').innerText = rawFecha;
+
+                    localStorage.setItem('cached_tasa_bcv', formattedRate);
+                    localStorage.setItem('cached_fecha_bcv', rawFecha);
+                }
+            } catch (err) {
+                console.error("Error obteniendo tasa desde JSON:", err);
+                const cachedRate = localStorage.getItem('cached_tasa_bcv');
+                const cachedDate = localStorage.getItem('cached_fecha_bcv');
+                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
+                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('val-fecha').innerText = getTodayFormatted();
+            fetchMenuData();
+            fetchTasaBCV();
+
+            setInterval(fetchMenuData, SYNC_INTERVAL);
+            setInterval(fetchTasaBCV, SYNC_INTERVAL);
+        });
+    </script>
+</body>
+</html>

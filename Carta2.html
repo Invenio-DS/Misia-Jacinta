@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misia Jacinta - Lista de Precios Carta</title>
+    <!-- Importación de Fuentes complementarias -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================================
+           1. CARGA DE LA FUENTE AVENIR-SEMIBOLD
+           ========================================================= */
+        @font-face {
+            font-family: 'Avenir-SemiBold';
+            src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        /* =========================================================
+           2. VARIABLES GLOBALES DE DISEÑO Y TIPOGRAFÍA
+           ========================================================= */
+        :root {
+            --fuente-principal: 'Avenir-SemiBold', sans-serif;
+            --fuente-bcv: 'Montserrat', sans-serif;
+
+            /* === TÍTULO PRINCIPAL (MENÚ) === */
+            --mostrar-titulo: none; 
+            --fuente-titulo: 'Avenir-SemiBold', sans-serif;
+            --tamano-titulo: 3.9vw;
+            --color-titulo: #462a18;
+            --sombra-titulo: 2px 3px 6px rgba(0, 0, 0, 0.4);
+            --posicion-top-titulo: 4%;
+
+            /* === COLORES DE LA CARTA === */
+            --color-categoria: #7c2d00;
+            --color-plato: #401c00;
+
+            /* Números de precios con el mismo color del plato */
+            --color-precio-ref: var(--color-plato);
+            --color-precio-bs:  var(--color-plato);
+
+            /* Colores de las etiquetas REF: y Bs. */
+            --color-etiqueta-ref: #7c2d00;
+            --color-etiqueta-bs:  #7c2d00;
+
+            /* === TAMAÑOS DE LOS PRECIOS Y TEXTOS === */
+            --tamano-categoria: 1.6vw;
+            --tamano-plato: 1.30vw;
+            --tamano-precio: 1.30vw;
+            --tamano-etiqueta: 1.00vw;
+
+            /* === TAMAÑOS DE LA TARJETA BCV === */
+            --tamano-bcv-titulo: 0.80vw;
+            --tamano-bcv-monto:  1.20vw;
+            --tamano-bcv-unidad: 0.75vw;
+            --tamano-bcv-fecha:  0.75vw;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--fuente-principal);
+        }
+
+        /* Canvas horizontal estándar 16:9 */
+        #tv-canvas {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-image: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Fondo-Carta 2.png');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        /* =========================================================
+           TÍTULO "MENÚ" CENTRALIZADO
+           ========================================================= */
+        #menu-main-title {
+            display: var(--mostrar-titulo);
+            position: absolute;
+            top: var(--posicion-top-titulo);
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--fuente-titulo);
+            font-size: var(--tamano-titulo);
+            color: var(--color-titulo);
+            text-shadow: var(--sombra-titulo);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 20;
+        }
+
+        /* =========================================================
+           TARJETA FLOTANTE BCV OFICIAL
+           ========================================================= */
+        #bcv-card {
+            position: absolute;
+            top: 2.8%;
+            right: 2.5%;
+            background: #ffffff;
+            border: 2.5px solid #200a5e;
+            border-radius: 14px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 10px;
+            gap: 12px;
+            z-index: 50;
+            font-family: var(--fuente-bcv);
+        }
+
+        .bcv-logo-wrapper {
+            width: 3.4vw;
+            height: 3.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bcv-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .bcv-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .bcv-title {
+            font-size: var(--tamano-bcv-titulo);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bcv-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0;
+        }
+
+        .bcv-rate {
+            font-size: var(--tamano-bcv-monto);
+            font-weight: 900;
+            color: #000000;
+            font-family: var(--fuente-principal);
+            display: inline-block;
+        }
+
+        .bcv-unit {
+            font-size: var(--tamano-bcv-unidad);
+            font-weight: 700;
+            color: #4a4a4a;
+        }
+
+        .bcv-date {
+            font-size: var(--tamano-bcv-fecha);
+            font-weight: 700;
+            color: #111111;
+            font-family: var(--fuente-principal);
+        }
+
+        /* =========================================================
+           CONTENEDOR MAESTRO DE PRODUCTOS (GRID EN 2 COLUMNAS)
+           ========================================================= */
+        #menu-container {
+            position: absolute;
+            top: 27%;
+            bottom: 6%;
+            left: 6%;
+            right: 6%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4vw;
+            z-index: 10;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .menu-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3vw;
+        }
+
+        .category-title {
+            font-size: var(--tamano-categoria);
+            color: var(--color-categoria);
+            text-transform: uppercase;
+            font-weight: 900;
+            border-bottom: 2px solid rgba(138, 59, 0, 0.3);
+            padding-bottom: 0.1vw;
+            margin-top: 0.21vw;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.21vw 0;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+        }
+
+        .item-info {
+            flex: 1;
+            padding-right: 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-name {
+            font-size: var(--tamano-plato);
+            color: var(--color-plato);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* =========================================================
+           ALINEACIÓN EN PX: COLUMNAS TOTALMENTE RECTAS Y FIJAS
+           ========================================================= */
+        .item-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 15px; /* Distancia fija entre REF y Bs */
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .price-box {
+            display: flex;
+            align-items: baseline;
+            font-size: var(--tamano-precio);
+            font-weight: 700;
+        }
+
+        /* Ancho fijo para REF */
+        .price-box.ref {
+            width: 60px;
+            color: var(--color-precio-ref);
+        }
+
+        /* Ancho fijo para Bs (holgado para xx.xxx,xx) */
+        .price-box.bs {
+            width: 90px;
+            color: var(--color-precio-bs);
+        }
+
+        /* Etiqueta clavada a la izquierda */
+        .price-lbl {
+            width: 38px;
+            font-size: var(--tamano-etiqueta);
+            font-weight: 600;
+            opacity: 1;
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .price-box.ref .price-lbl {
+            color: var(--color-etiqueta-ref);
+        }
+
+        .price-box.bs .price-lbl {
+            color: var(--color-etiqueta-bs);
+        }
+
+        /* Número justificado a la derecha con ancho tabular */
+        .price-val {
+            flex: 1;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tv-canvas">
+        <!-- TÍTULO CENTRAL -->
+        <div id="menu-main-title">MENÚ</div>
+
+        <!-- TARJETA BCV FLOTANTE OFICIAL -->
+        <div id="bcv-card">
+            <div class="bcv-logo-wrapper">
+                <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
+            </div>
+            <div class="bcv-details">
+                <span class="bcv-title">TASA BCV OFICIAL</span>
+                <div class="bcv-price-row">
+                    <span class="bcv-rate" id="val-bcv">0,0000</span>
+                    <span class="bcv-unit">Bs./USD</span>
+                </div>
+                <span class="bcv-date" id="val-fecha">--/--/----</span>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR PAGINADO (12 Y 12) -->
+        <div id="menu-container">
+            <div class="menu-column" id="col-left"></div>
+            <div class="menu-column" id="col-right"></div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1021186658&single=true&output=csv";
+        const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
+        
+        // Configuraciones de Paginación
+        const SYNC_INTERVAL = 60000;
+        const PAGE_DURATION = 30000;
+        const MAX_ITEMS_PER_COLUMN = 12; 
+        const MAX_ITEMS_PER_PAGE = MAX_ITEMS_PER_COLUMN * 2;
+
+        let allActiveItems = [];
+        let currentPageIndex = 0;
+        let paginationTimer = null;
+
+        function parseCSVLine(line) {
+            const result = [];
+            let curValue = "";
+            let inQuotes = false;
+            
+            const delim = (line.match(/;/g) || []).length > (line.match(/,/g) || []).length ? ';' : ',';
+
+            for (let char of line) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === delim && !inQuotes) {
+                    result.push(curValue);
+                    curValue = "";
+                } else curValue += char;
+            }
+            result.push(curValue);
+            return result;
+        }
+
+        function parseCustomFloat(val) {
+            if (!val) return 0;
+            let str = String(val).trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            let n = parseFloat(str.replace(/[^\d.-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatPrice(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,00";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatBCVRate(val) {
+            if (!val) return "0,0000";
+            let str = String(val).trim();
+            if (str.includes(',')) str = str.replace(',', '.');
+            let n = parseFloat(str);
+            if (isNaN(n) || n === 0) return "0,0000";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        function getTodayFormatted() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        // =========================================================
+        // CARGA DIRECTA Y LIMPIA
+        // =========================================================
+        async function fetchMenuData() {
+            try {
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                if (!response.ok) throw new Error("No se pudo obtener el CSV");
+                
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
+
+                if (lines.length < 2) return;
+
+                const activeItems = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCSVLine(lines[i]);
+                    if (!cols || cols.length < 3) continue;
+
+                    // Columna I = Índice 8
+                    const valColI = cols[8] ? String(cols[8]).toUpperCase().trim() : "";
+                    const nombrePlato = cols[2] ? String(cols[2]).trim() : "";
+
+                    const isValid = valColI.includes("VERD") || 
+                                    valColI.includes("TRUE") || 
+                                    valColI === "1" || 
+                                    valColI === "SI" || 
+                                    valColI === "V";
+
+                    if (isValid && nombrePlato !== "") {
+                        activeItems.push({
+                            categoria: cols[1] ? String(cols[1]).trim() : "VARIOS", // Columna B
+                            nombre: nombrePlato,                                     // Columna C
+                            ref: formatPrice(cols[4]),                               // Columna E
+                            bs: formatPrice(cols[5])                                 // Columna F
+                        });
+                    }
+                }
+
+                allActiveItems = activeItems;
+
+                if (!paginationTimer && allActiveItems.length > 0) {
+                    startPagination();
+                } else if (allActiveItems.length > 0) {
+                    renderCurrentPage();
+                }
+
+            } catch (err) {
+                console.error("Error sincronizando menú:", err);
+            }
+        }
+
+        // =========================================================
+        // MOTOR DE PAGINACIÓN AUTOMÁTICA
+        // =========================================================
+        function startPagination() {
+            if (paginationTimer) clearInterval(paginationTimer);
+
+            renderCurrentPage();
+
+            if (allActiveItems.length > MAX_ITEMS_PER_PAGE) {
+                paginationTimer = setInterval(() => {
+                    const totalPages = Math.ceil(allActiveItems.length / MAX_ITEMS_PER_PAGE);
+                    currentPageIndex = (currentPageIndex + 1) % totalPages;
+                    changePageWithTransition();
+                }, PAGE_DURATION);
+            }
+        }
+
+        function changePageWithTransition() {
+            const container = document.getElementById('menu-container');
+            container.style.opacity = 0; 
+            
+            setTimeout(() => {
+                renderCurrentPage();
+                container.style.opacity = 1; 
+            }, 500); 
+        }
+
+        function renderCurrentPage() {
+            if (allActiveItems.length === 0) return;
+
+            const startIndex = currentPageIndex * MAX_ITEMS_PER_PAGE;
+            const pageItems = allActiveItems.slice(startIndex, startIndex + MAX_ITEMS_PER_PAGE);
+
+            const colLeftItems = pageItems.slice(0, MAX_ITEMS_PER_COLUMN);
+            const colRightItems = pageItems.slice(MAX_ITEMS_PER_COLUMN, MAX_ITEMS_PER_PAGE);
+
+            renderColumn("col-left", colLeftItems);
+            renderColumn("col-right", colRightItems);
+        }
+
+        function renderColumn(elementId, items) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = "";
+
+            let lastCategory = "";
+
+            items.forEach(item => {
+                if (item.categoria !== lastCategory) {
+                    const catTitle = document.createElement("div");
+                    catTitle.className = "category-title";
+                    catTitle.innerText = item.categoria;
+                    container.appendChild(catTitle);
+                    lastCategory = item.categoria;
+                }
+
+                const row = document.createElement("div");
+                row.className = "menu-item-row";
+                row.innerHTML = `
+                    <div class="item-info">
+                        <span class="item-name">${item.nombre}</span>
+                    </div>
+                    <div class="item-prices">
+                        <div class="price-box ref">
+                            <span class="price-lbl">REF:</span>
+                            <span class="price-val">${item.ref}</span>
+                        </div>
+                        <div class="price-box bs">
+                            <span class="price-lbl">Bs.</span>
+                            <span class="price-val">${item.bs}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // =========================================================
+        // CONSULTA DE LA TASA OFICIAL BCV
+        // =========================================================
+        async function fetchTasaBCV() {
+            try {
+                const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error("Error obteniendo tasa.json");
+                
+                const data = await response.json();
+                let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
+                if (!rawTasa && typeof data === 'object') {
+                    for (let k of Object.keys(data)) {
+                        if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
+                            rawTasa = data[k];
+                            break;
+                        }
+                    }
+                }
+
+                let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
+
+                if (rawTasa) {
+                    const formattedRate = formatBCVRate(rawTasa);
+                    document.getElementById('val-bcv').innerText = formattedRate;
+                    document.getElementById('val-fecha').innerText = rawFecha;
+
+                    localStorage.setItem('cached_tasa_bcv', formattedRate);
+                    localStorage.setItem('cached_fecha_bcv', rawFecha);
+                }
+            } catch (err) {
+                console.error("Error obteniendo tasa desde JSON:", err);
+                const cachedRate = localStorage.getItem('cached_tasa_bcv');
+                const cachedDate = localStorage.getItem('cached_fecha_bcv');
+                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
+                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('val-fecha').innerText = getTodayFormatted();
+            fetchMenuData();
+            fetchTasaBCV();
+
+            setInterval(fetchMenuData, SYNC_INTERVAL);
+            setInterval(fetchTasaBCV, SYNC_INTERVAL);
+        });
+    </script>
+</body>
+</html>

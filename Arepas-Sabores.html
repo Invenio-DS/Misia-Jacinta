@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misia Jacinta - Arepas Especiales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================================
+           1. FUENTE AVENIR-SEMIBOLD
+           ========================================================= */
+        @font-face {
+            font-family: 'Avenir-SemiBold';
+            src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        /* =========================================================
+           2. CONFIGURACIÓN CENTRAL DE TIPOGRAFÍAS Y TAMAÑOS
+           ========================================================= */
+        :root {
+            --fuente-precios: 'Avenir-SemiBold', sans-serif;
+            --fuente-bcv: 'Montserrat', sans-serif;
+
+            /* Tipografía y tamaños dentro de las cajas amarillas */
+            --tamano-precio-ref: 0.92vw; 
+            --tamano-precio-bs:  0.85vw;
+            --tamano-etiqueta:   0.60vw;
+
+            /* Tarjeta BCV */
+            --tamano-bcv-titulo: 0.80vw;
+            --tamano-bcv-monto:  1.20vw;
+            --tamano-bcv-unidad: 0.75vw;
+            --tamano-bcv-fecha:  0.75vw;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--fuente-precios);
+        }
+
+        /* Canvas horizontal estándar 16:9 */
+        #tv-canvas {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        #video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            z-index: 1;
+        }
+
+        /* =========================================================
+           TARJETA FLOTANTE BCV OFICIAL (ESQUINA SUPERIOR DERECHA)
+           ========================================================= */
+        #bcv-card {
+            position: absolute;
+            top: 2.8%;
+            right: 2.5%;
+            background: #ffffff;
+            border: 2.5px solid #200a5e;
+            border-radius: 14px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 10px;
+            gap: 12px;
+            z-index: 50;
+            font-family: var(--fuente-bcv);
+        }
+
+        .bcv-logo-wrapper {
+            width: 3.4vw;
+            height: 3.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bcv-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .bcv-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .bcv-title {
+            font-size: var(--tamano-bcv-titulo);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bcv-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0;
+        }
+
+        .bcv-rate {
+            font-size: var(--tamano-bcv-monto);
+            font-weight: 900;
+            color: #000000;
+            font-family: var(--fuente-precios);
+            display: inline-block;
+        }
+
+        .bcv-unit {
+            font-size: var(--tamano-bcv-unidad);
+            font-weight: 700;
+            color: #4a4a4a;
+        }
+
+        .bcv-date {
+            font-size: var(--tamano-bcv-fecha);
+            font-weight: 700;
+            color: #111111;
+            font-family: var(--fuente-precios);
+        }
+
+        /* =========================================================
+           CONTENEDOR GLOBAL DE LOS 8 SLOTS DE PRECIOS
+           ========================================================= */
+        #prices-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+            opacity: 0; /* Inicia difuminado/oculto */
+            transition: opacity 0.45s ease-in-out; /* Difuminación sutil */
+        }
+
+        /* Estilo base de cada cajetín amarillo */
+        .arepa-box {
+            position: absolute;
+            width: 19.8%;
+            height: 6.8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0.4vw;
+        }
+
+        /* =========================================================
+           COORDENADAS EXACTAS DE LOS 8 CAJETINES AMARILLOS
+           ========================================================= */
+        /* FILA SUPERIOR */
+        #slot-0 { left: 4.8%;  top: 48.0%; } /* Reina */
+        #slot-1 { left: 28.0%; top: 48.0%; } /* Sifrina */
+        #slot-2 { left: 51.5%; top: 48.0%; } /* Catira */
+        #slot-3 { left: 74.8%; top: 48.0%; } /* Llanera */
+
+        /* FILA INFERIOR */
+        #slot-4 { left: 4.8%;  top: 75.8%; } /* Jamón y queso */
+        #slot-5 { left: 28.0%; top: 75.8%; } /* Pelúa */
+        #slot-6 { left: 51.5%; top: 75.8%; } /* Pérnil */
+        #slot-7 { left: 74.8%; top: 75.8%; } /* Pabellón */
+
+        /* Bloque interno de tamaño: Mediana (izq) y Grande (der) */
+        .size-box {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 2px;
+        }
+
+        .price-line {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 2px;
+            white-space: nowrap;
+            line-height: 1.25;
+        }
+
+        .price-ref {
+            color: #7c2d00;
+            font-size: var(--tamano-precio-ref);
+            font-weight: 700;
+        }
+
+        .price-bs {
+            color: #ffffff;
+            font-size: var(--tamano-precio-bs);
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+        }
+
+        .lbl {
+            font-size: var(--tamano-etiqueta);
+            font-weight: 700;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tv-canvas">
+        <!-- VIDEO DE FONDO DE 20 SEGUNDOS -->
+        <video id="video-bg" autoplay muted loop playsinline>
+            <source src="https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Arepas-Especiales.mp4" type="video/mp4">
+        </video>
+
+        <!-- TARJETA BCV FLOTANTE OFICIAL -->
+        <div id="bcv-card">
+            <div class="bcv-logo-wrapper">
+                <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
+            </div>
+            <div class="bcv-details">
+                <span class="bcv-title">TASA BCV OFICIAL</span>
+                <div class="bcv-price-row">
+                    <span class="bcv-rate" id="val-bcv">0,0000</span>
+                    <span class="bcv-unit">Bs./USD</span>
+                </div>
+                <span class="bcv-date" id="val-fecha">--/--/----</span>
+            </div>
+        </div>
+
+        <!-- CAPA DE LOS 8 PRECIOS SUPERPUESTOS -->
+        <div id="prices-layer">
+            <!-- 1. Reina -->
+            <div class="arepa-box" id="slot-0">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 2. Sifrina -->
+            <div class="arepa-box" id="slot-1">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 3. Catira -->
+            <div class="arepa-box" id="slot-2">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 4. Llanera -->
+            <div class="arepa-box" id="slot-3">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 5. Jamón y queso -->
+            <div class="arepa-box" id="slot-4">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 6. Pelúa -->
+            <div class="arepa-box" id="slot-5">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 7. Pérnil -->
+            <div class="arepa-box" id="slot-6">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+
+            <!-- 8. Pabellón -->
+            <div class="arepa-box" id="slot-7">
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-m">0,00</span></div>
+                </div>
+                <div class="size-box">
+                    <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-g">0,00</span></div>
+                    <div class="price-line price-bs"><span class="lbl">Bs.</span><span class="v-bs-g">0,00</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. CONFIGURACIÓN DE TIEMPOS DEL VIDEO (EDITABLE)
+        // =========================================================
+        const TIME_FADE_IN  = 6.0;  // Segundo en que APARECEN los precios sutilmente
+        const TIME_FADE_OUT = 19.3; // Segundo en que DESAPARECEN los precios sutilmente
+
+        // =========================================================
+        // 2. CONFIGURACIÓN DE FILAS DE GOOGLE SHEETS (EDITABLE)
+        // =========================================================
+        // Filas físicas en Excel: de la fila 7 a la 14
+        const EXCEL_ROW_START = 7;  
+        const EXCEL_ROW_END   = 14; 
+
+        // URLs de integración
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
+        const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
+        const SYNC_INTERVAL = 60000; // Sincroniza hoja cada 60 segundos
+
+        let arepasData = [];
+
+        function parseCSVLine(line) {
+            const result = [];
+            let curValue = "";
+            let inQuotes = false;
+            
+            const delim = (line.match(/;/g) || []).length > (line.match(/,/g) || []).length ? ';' : ',';
+
+            for (let char of line) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === delim && !inQuotes) {
+                    result.push(curValue);
+                    curValue = "";
+                } else curValue += char;
+            }
+            result.push(curValue);
+            return result;
+        }
+
+        function parseCustomFloat(val) {
+            if (!val) return 0;
+            let str = String(val).trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            let n = parseFloat(str.replace(/[^\d.-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatPrice(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,00";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatBCVRate(val) {
+            if (!val) return "0,0000";
+            let str = String(val).trim();
+            if (str.includes(',')) str = str.replace(',', '.');
+            let n = parseFloat(str);
+            if (isNaN(n) || n === 0) return "0,0000";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        function getTodayFormatted() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        // =========================================================
+        // CARGA DE LAS FILAS 7 A 14 Y COLUMNAS D, E, F, G
+        // =========================================================
+        async function fetchMenuData() {
+            try {
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                if (!response.ok) throw new Error("No se pudo obtener el CSV");
+
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
+
+                arepasData = [];
+
+                // Convertimos el rango de filas de Excel a índices de array en JavaScript (Excel - 1)
+                const startIndex = EXCEL_ROW_START - 1; // Fila 7 -> índice 6
+                const endIndex   = EXCEL_ROW_END - 1;   // Fila 14 -> índice 13
+
+                for (let r = startIndex; r <= endIndex && r < lines.length; r++) {
+                    const cols = parseCSVLine(lines[r]);
+                    if (!cols || cols.length < 7) continue;
+
+                    arepasData.push({
+                        refM: formatPrice(cols[3]), // Columna D -> Mediana REF
+                        bsM:  formatPrice(cols[4]), // Columna E -> Mediana Bs
+                        refG: formatPrice(cols[5]), // Columna F -> Grande REF
+                        bsG:  formatPrice(cols[6])  // Columna G -> Grande Bs
+                    });
+                }
+
+                renderAllSlots();
+
+            } catch (err) {
+                console.error("Error sincronizando arepas especiales:", err);
+            }
+        }
+
+        function renderAllSlots() {
+            for (let i = 0; i < 8; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                if (!slot) continue;
+
+                const data = arepasData[i] || { refM: "0,00", bsM: "0,00", refG: "0,00", bsG: "0,00" };
+
+                slot.querySelector('.v-ref-m').innerText = data.refM;
+                slot.querySelector('.v-bs-m').innerText  = data.bsM;
+                slot.querySelector('.v-ref-g').innerText = data.refG;
+                slot.querySelector('.v-bs-g').innerText  = data.bsG;
+            }
+        }
+
+        // =========================================================
+        // CONTROLADOR DE TIEMPOS CON DIFUMINACIÓN SUTIL
+        // =========================================================
+        const video = document.getElementById('video-bg');
+        const pricesLayer = document.getElementById('prices-layer');
+
+        video.addEventListener('timeupdate', () => {
+            const t = video.currentTime;
+
+            // Difuminación: aparece a los 6.0s y desaparece a los 19.3s
+            if (t >= TIME_FADE_IN && t <= TIME_FADE_OUT) {
+                pricesLayer.style.opacity = '1';
+            } else {
+                pricesLayer.style.opacity = '0';
+            }
+        });
+
+        // =========================================================
+        // CONSULTA DE LA TASA OFICIAL BCV
+        // =========================================================
+        async function fetchTasaBCV() {
+            try {
+                const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error("Error obteniendo tasa.json");
+                
+                const data = await response.json();
+                let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
+                if (!rawTasa && typeof data === 'object') {
+                    for (let k of Object.keys(data)) {
+                        if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
+                            rawTasa = data[k];
+                            break;
+                        }
+                    }
+                }
+
+                let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
+
+                if (rawTasa) {
+                    const formattedRate = formatBCVRate(rawTasa);
+                    document.getElementById('val-bcv').innerText = formattedRate;
+                    document.getElementById('val-fecha').innerText = rawFecha;
+
+                    localStorage.setItem('cached_tasa_bcv', formattedRate);
+                    localStorage.setItem('cached_fecha_bcv', rawFecha);
+                }
+            } catch (err) {
+                console.error("Error obteniendo tasa desde JSON:", err);
+                const cachedRate = localStorage.getItem('cached_tasa_bcv');
+                const cachedDate = localStorage.getItem('cached_fecha_bcv');
+                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
+                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('val-fecha').innerText = getTodayFormatted();
+            fetchMenuData();
+            fetchTasaBCV();
+
+            setInterval(fetchMenuData, SYNC_INTERVAL);
+            setInterval(fetchTasaBCV, SYNC_INTERVAL);
+        });
+    </script>
+</body>
+</html>

@@ -24,9 +24,9 @@
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
             --fuente-bcv: 'Montserrat', sans-serif;
 
-            /* Tamaños dentro de los 3 slots */
-            --tamano-precio-ref: 1.50vw; 
-            --tamano-precio-bs:  1.60vw;
+            /* Tamaños dentro de los 4 slots */
+            --tamano-precio-ref: 1.40vw; 
+            --tamano-precio-bs:  1.40vw;
             --tamano-etiqueta:   0.90vw;  /* "REF:" y "Bs." */
 
             --tamano-bcv-titulo: 0.80vw;
@@ -167,17 +167,17 @@
         }
 
         #slot-left {
-            left: 7.8%;
+            left: 7.5%;
             top: 76.2%;
         }
 
         #slot-center {
-            left: 42.2%;
-            top: 71.8%;
+            left: 41.2%;
+            top: 73.8%;
         }
 
         #slot-right {
-            left: 74.4%;
+            left: 73.4%;
             top: 76.2%;
         }
 
@@ -289,8 +289,9 @@
         // Fases de rotación del video (Izquierda, Centro, Derecha)
         const ROTACIONES = [
             { start: 3.1,  end: 7.2,  left: 0, center: 1, right: 2 }, // Mechada, Pollo, Jamón
-            { start: 8.1,  end: 12.2, left: 3, center: 0, right: 1 }, // Queso Plancha, Mechada, Pollo
-            { start: 13.1, end: 17.2, left: 2, center: 3, right: 0 }  // Jamón, Queso Plancha, Mechada
+            { start: 8.1,  end: 12.2, left: 3, center: 0, right: 1 }, // Amarillo, Mechada, Pollo
+            { start: 13.1, end: 17.2, left: 2, center: 3, right: 0 }  // Queso Plancha, Amarillo, Mechada
+	    { start: 18.1, end: 22.5, left: 2, center: 3, right: 0 }  // Jamón, Queso Plancha, Amarillo
         ];
 
         function parseCSVLine(line) {

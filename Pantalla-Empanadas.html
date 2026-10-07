@@ -24,12 +24,10 @@
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
             --fuente-bcv: 'Montserrat', sans-serif;
 
-            /* Tipografía dentro de los cajetines */
-            --tamano-precio-ref: 1.8vw; 
-            --tamano-precio-bs:  1.6vw;
-            --tamano-etiqueta:   1.0vw;
+            --tamano-precio-ref: 2.4vw; 
+            --tamano-precio-bs:  2.1vw;
+            --tamano-etiqueta:   1.50vw;
 
-            /* Tarjeta BCV */
             --tamano-bcv-titulo: 0.90vw;
             --tamano-bcv-monto:  1.50vw;
             --tamano-bcv-unidad: 0.85vw;
@@ -65,7 +63,7 @@
         }
 
         /* =========================================================
-           VIDEOS SUPERPUESTOS (ZERO-BLINK TRANSITION)
+           VIDEOS SUPERPUESTOS (HARDWARE ACCELERATED CROSSFADE)
            ========================================================= */
         .video-layer {
             position: absolute;
@@ -77,12 +75,19 @@
             display: block;
             opacity: 0;
             z-index: 1;
+            /* Transición suave de 1.2s acelerada por GPU */
             transition: opacity 1.2s ease-in-out;
+            will-change: opacity;
         }
 
         .video-active {
-            opacity: 1;
-            z-index: 2;
+            opacity: 1 !important;
+            z-index: 3 !important;
+        }
+
+        .video-standby {
+            opacity: 1 !important;
+            z-index: 2 !important; /* Mantiene el video viejo abajo tapando el negro */
         }
 
         /* =========================================================
@@ -164,46 +169,40 @@
         }
 
         /* =========================================================
-           CAJETÍN 1: EMPANADAS INDIVIDUALES (POSICIÓN EXACTA)
+           CAJETINES DE PRECIOS EXACTOS
            ========================================================= */
         #precio-slot {
             position: absolute;
-            left: 56.5%;
-            top: 67.5%;
+            left: 39.5%;
+            top: 74.4%;
             width: 19.5%;
             height: 7.5%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 20;
+            z-index: 40;
             opacity: 0;
             transition: opacity 0.4s ease-in-out;
-            transform: rotate(-2.5deg);
+            transform: rotate(-2.3deg);
         }
 
-        /* =========================================================
-           CAJETÍN 2: COMBOS DE EMPANADAS (POSICIÓN EXACTA)
-           ========================================================= */
         #combo-slot {
             position: absolute;
-            left: 71.2%;
-            top: 48.0%;
+            left: 69.2%;
+            top: 46.0%;
             width: 20.5%;
             height: 8.5%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 20;
+            z-index: 40;
             opacity: 0;
             transition: opacity 0.35s ease-in-out;
-            transform: rotate(-2.5deg);
+            transform: rotate(-2.3deg);
         }
 
-        /* =========================================================
-           LÍNEAS DE PRECIOS Y TIPOGRAFÍAS
-           ========================================================= */
         .price-line {
             display: inline-flex;
             align-items: baseline;
@@ -235,12 +234,12 @@
 <body>
 
     <div id="tv-canvas">
-        <!-- VIDEO 1: EMPANADAS INDIVIDUALES -->
+        <!-- VIDEO 1: EMPANADAS -->
         <video id="video-empanadas" class="video-layer video-active" autoplay muted playsinline preload="auto">
             <source src="https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Empanadas.mp4" type="video/mp4">
         </video>
 
-        <!-- VIDEO 2: COMBOS DE EMPANADAS -->
+        <!-- VIDEO 2: COMBOS -->
         <video id="video-combos" class="video-layer" muted playsinline preload="auto">
             <source src="https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Combo_Empanadas.mp4" type="video/mp4">
         </video>
@@ -260,13 +259,13 @@
             </div>
         </div>
 
-        <!-- CAJETÍN 1: EMPANADA INDIVIDUAL (FILA 2) -->
+        <!-- CAJETÍN EMPANADAS INDIVIDUAL (FILA 2) -->
         <div id="precio-slot">
             <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref">0,00</span></div>
             <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-bs">0,00</span></div>
         </div>
 
-        <!-- CAJETÍN 2: COMBOS ROTATIVOS (FILAS 3 A 5) -->
+        <!-- CAJETÍN COMBOS ROTATIVOS (FILAS 3 A 5) -->
         <div id="combo-slot">
             <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-combo-ref">0,00</span></div>
             <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-combo-bs">0,00</span></div>
@@ -278,20 +277,18 @@
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 60000;
 
-        // TIMINGS DE CADA VIDEO
+        // TIEMPOS DE ANIMACIÓN
         const DURACION_EMPANADAS = 22.0;
         const DURACION_COMBOS    = 41.0;
-        const TIEMPO_CROSSFADE   = 1.2;
+        const TIEMPO_FADE        = 1.2;
 
-        // Intervalo de visibilidad en Empanadas
         const TIME_EMPANADA_IN  = 6.5;
         const TIME_EMPANADA_OUT = 19.5;
 
-        // Rotación de los 3 Combos
         const TIMELINE_COMBOS = [
-            { start: 4.8,  end: 9.6,  index: 0 }, // Fila 3: Combo Malta
-            { start: 10.8, end: 18.2, index: 1 }, // Fila 4: Combo Jugo
-            { start: 19.5, end: 27.5, index: 2 }  // Fila 5: Combo Guayoyo
+            { start: 5.4,  end: 10.8,  index: 0 }, // Combo 1: 2 Empanadas + 1 Malta (Fila 3)
+            { start: 12.1, end: 19.9, index: 1 }, // Combo 2: 2 Empanadas + 1 Jugo (Fila 4)
+            { start: 20.9, end: 28.0, index: 2 }  // Combo 3: 2 Empanadas + 1 Guayoyo (Fila 5)
         ];
 
         let precioEmpanada = { ref: "0,00", bs: "0,00" };
@@ -322,11 +319,8 @@
         function parseCustomFloat(val) {
             if (!val) return 0;
             let str = String(val).trim();
-            if (str.includes('.') && str.includes(',')) {
-                str = str.replace(/\./g, '').replace(',', '.');
-            } else if (str.includes(',')) {
-                str = str.replace(',', '.');
-            }
+            if (str.includes('.') && str.includes(',')) str = str.replace(/\./g, '').replace(',', '.');
+            else if (str.includes(',')) str = str.replace(',', '.');
             let n = parseFloat(str.replace(/[^\d.-]/g, ''));
             return isNaN(n) ? 0 : n;
         }
@@ -354,20 +348,16 @@
             return `${d}/${m}/${y}`;
         }
 
-        // =========================================================
-        // LECTURA DE FILAS (FILA 2: INDIVIDUAL | FILAS 3 A 5: COMBOS)
-        // =========================================================
         async function fetchMenuData() {
             try {
                 const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
-                if (!response.ok) throw new Error("No se pudo descargar el CSV");
+                if (!response.ok) return;
 
                 const text = await response.text();
                 const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
 
                 if (lines.length < 5) return;
 
-                // Fila física 2 (Índice 1) -> Empanada Individual
                 const colsEmp = parseCSVLine(lines[1]);
                 precioEmpanada = {
                     ref: formatPrice(colsEmp[3]),
@@ -376,7 +366,6 @@
                 document.getElementById('v-ref').innerText = precioEmpanada.ref;
                 document.getElementById('v-bs').innerText  = precioEmpanada.bs;
 
-                // Filas físicas 3 a 5 (Índices 2 a 4) -> 3 Combos
                 combosData = [];
                 for (let r = 2; r <= 4; r++) {
                     const colsC = parseCSVLine(lines[r]);
@@ -386,16 +375,13 @@
                         bs:  formatPrice(colsC[4])
                     });
                 }
-            } catch (err) {
-                console.error("Error sincronizando menú:", err);
-            }
+            } catch (err) {}
         }
 
         async function fetchTasaBCV() {
             try {
                 const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error("Error obteniendo tasa.json");
-                
+                if (!response.ok) return;
                 const data = await response.json();
                 let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
                 if (!rawTasa && typeof data === 'object') {
@@ -406,53 +392,49 @@
                         }
                     }
                 }
-
                 let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
-
                 if (rawTasa) {
                     const formattedRate = formatBCVRate(rawTasa);
                     document.getElementById('val-bcv').innerText = formattedRate;
                     document.getElementById('val-fecha').innerText = rawFecha;
-
-                    localStorage.setItem('cached_tasa_bcv', formattedRate);
-                    localStorage.setItem('cached_fecha_bcv', rawFecha);
                 }
-            } catch (err) {
-                const cachedRate = localStorage.getItem('cached_tasa_bcv');
-                const cachedDate = localStorage.getItem('cached_fecha_bcv');
-                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
-                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
-            }
+            } catch (err) {}
         }
 
         // =========================================================
-        // CONTROLADOR DE TIEMPO DEL VIDEO (DOBLE BUFFER CONTINUO)
+        // MOTOR SIN PARPADEO (PRE-ROLL ANTICIPADO)
         // =========================================================
-        let videoActivo = 'empanadas';
-        let cambioProgramado = false;
+        let videoVisible = 'empanadas';
+        let precargaIniciada = false;
 
-        // Monitoreo video Empanadas
+        // Monitoreo Empanadas
         vidEmpanadas.addEventListener('timeupdate', () => {
             const t = vidEmpanadas.currentTime;
 
-            if (videoActivo === 'empanadas' && t >= TIME_EMPANADA_IN && t <= TIME_EMPANADA_OUT) {
+            // Cajetín
+            if (videoVisible === 'empanadas' && t >= TIME_EMPANADA_IN && t <= TIME_EMPANADA_OUT) {
                 slotEmpanadas.style.opacity = '1';
             } else {
                 slotEmpanadas.style.opacity = '0';
             }
 
-            // A 1.2s antes de terminar, inicia Combos y hace la mezcla
-            if (videoActivo === 'empanadas' && t >= (DURACION_EMPANADAS - TIEMPO_CROSSFADE) && !cambioProgramado) {
-                cambioProgramado = true;
-                pasarACombos();
+            // 1.8 segundos antes de terminar: Pre-roll invisible de Combos
+            if (videoVisible === 'empanadas' && t >= (DURACION_EMPANADAS - 1.8) && !precargaIniciada) {
+                precargaIniciada = true;
+                vidCombos.currentTime = 0;
+                vidCombos.play().then(() => {
+                    // Espera que ya esté corriendo el flujo de video y hace el crossfade
+                    ejecutarCrossfade(vidEmpanadas, vidCombos, 'combos');
+                }).catch(() => {});
             }
         });
 
-        // Monitoreo video Combos
+        // Monitoreo Combos
         vidCombos.addEventListener('timeupdate', () => {
             const t = vidCombos.currentTime;
 
-            if (videoActivo === 'combos') {
+            // Cajetín
+            if (videoVisible === 'combos') {
                 const match = TIMELINE_COMBOS.find(item => t >= item.start && t <= item.end);
                 if (match && combosData[match.index]) {
                     document.getElementById('v-combo-ref').innerText = combosData[match.index].ref;
@@ -465,37 +447,34 @@
                 slotCombos.style.opacity = '0';
             }
 
-            // A 1.2s antes de terminar, inicia Empanadas y hace la mezcla
-            if (videoActivo === 'combos' && t >= (DURACION_COMBOS - TIEMPO_CROSSFADE) && !cambioProgramado) {
-                cambioProgramado = true;
-                pasarAEmpanadas();
+            // 1.8 segundos antes de terminar: Pre-roll invisible de Empanadas
+            if (videoVisible === 'combos' && t >= (DURACION_COMBOS - 1.8) && !precargaIniciada) {
+                precargaIniciada = true;
+                vidEmpanadas.currentTime = 0;
+                vidEmpanadas.play().then(() => {
+                    // Espera que ya esté corriendo el flujo de video y hace el crossfade
+                    ejecutarCrossfade(vidCombos, vidEmpanadas, 'empanadas');
+                }).catch(() => {});
             }
         });
 
-        function pasarACombos() {
-            vidCombos.currentTime = 0;
-            vidCombos.play();
-            vidCombos.classList.add('video-active');
+        function ejecutarCrossfade(vidSaliente, vidEntrante, nuevoNombre) {
+            // El entrante pasa al frente absoluto y se enciende suavemente
+            vidEntrante.classList.add('video-active');
+            vidEntrante.classList.remove('video-standby');
 
+            // El saliente se queda abajo al 100% de opacidad para que NUNCA se vea el fondo negro
+            vidSaliente.classList.add('video-standby');
+            vidSaliente.classList.remove('video-active');
+
+            // Solo tras terminar el fundido (1.3 segundos después), se retira el viejo
             setTimeout(() => {
-                vidEmpanadas.classList.remove('video-active');
-                vidEmpanadas.pause();
-                videoActivo = 'combos';
-                cambioProgramado = false;
-            }, TIEMPO_CROSSFADE * 1000);
-        }
-
-        function pasarAEmpanadas() {
-            vidEmpanadas.currentTime = 0;
-            vidEmpanadas.play();
-            vidEmpanadas.classList.add('video-active');
-
-            setTimeout(() => {
-                vidCombos.classList.remove('video-active');
-                vidCombos.pause();
-                videoActivo = 'empanadas';
-                cambioProgramado = false;
-            }, TIEMPO_CROSSFADE * 1000);
+                vidSaliente.classList.remove('video-standby');
+                vidSaliente.style.opacity = '0';
+                vidSaliente.pause();
+                videoVisible = nuevoNombre;
+                precargaIniciada = false;
+            }, (TIEMPO_FADE * 1000) + 100);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -506,7 +485,7 @@
             setInterval(fetchMenuData, SYNC_INTERVAL);
             setInterval(fetchTasaBCV, SYNC_INTERVAL);
 
-            vidEmpanadas.play();
+            vidEmpanadas.play().catch(() => {});
         });
     </script>
 </body>

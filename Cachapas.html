@@ -248,17 +248,16 @@
 
         let cachapasPrecios = [];
 
-        // TIMING EXACTO DEL VIDEO PARA CADA CACHAPA (en segundos)
+        // TIMING EXACTO DEL VIDEO PARA LAS 5 CACHAPAS (en segundos)
         const TIMELINE = [
-            { start: 3.6,  end: 7.9,  index: 0 }, // Fila 2 de Excel (Queso de mano)
-            { start: 8.9,  end: 14.3, index: 1 }, // Fila 3 de Excel (Doble queso)
-            { start: 15.0, end: 21.3, index: 2 }, // Fila 4 de Excel (Jamón y queso)
-            { start: 22.2, end: 27.9, index: 3 }, // Fila 5 de Excel (Mechada y queso)
-            { start: 28.5, end: 34.0, index: 4 }, // Fila 6 de Excel (Pernil y queso)
-            { start: 34.5, end: 39.5, index: 5 }  // Fila 7 de Excel (Sexta cachapa si la hay)
+            { start: 3.6,  end: 7.9,  index: 0 }, // Fila 2 de Excel: Queso de mano
+            { start: 8.9,  end: 14.3, index: 1 }, // Fila 3 de Excel: Doble queso
+            { start: 15.0, end: 21.3, index: 2 }, // Fila 4 de Excel: Jamón y queso
+            { start: 22.2, end: 27.9, index: 3 }, // Fila 5 de Excel: Mechada y queso
+            { start: 28.5, end: 34.0, index: 4 }  // Fila 6 de Excel: Pernil y queso
         ];
 
-        // Parser robusto con autodetección de comas o punto y coma
+        // Parser robusto con soporte para comas (,) y punto y coma (;)
         function parseCSVLine(line) {
             const result = [];
             let curValue = "";
@@ -312,7 +311,7 @@
         }
 
         // =========================================================
-        // LECTURA EXACTA DE FILAS 2 A 7 Y COLUMNAS D, E, F, G
+        // LECTURA EXACTA DE LAS 5 FILAS (2 A 6 DE EXCEL)
         // =========================================================
         async function fetchMenuData() {
             try {
@@ -326,9 +325,9 @@
 
                 cachapasPrecios = [];
 
-                // Fila 2 de Excel = índice 1 en líneas
-                // Fila 7 de Excel = índice 6 en líneas
-                for (let i = 1; i <= 6 && i < lines.length; i++) {
+                // Fila física 2 de Excel = índice 1 en lines
+                // Fila física 6 de Excel = índice 5 en lines (Exactamente 5 filas)
+                for (let i = 1; i <= 5 && i < lines.length; i++) {
                     const cols = parseCSVLine(lines[i]);
                     if (!cols || cols.length < 7) continue;
 

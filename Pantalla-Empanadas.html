@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INVENIO - Misia Jacinta (Empanadas y Combos)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================================
+           1. CARGA DE FUENTE AVENIR-SEMIBOLD
+           ========================================================= */
+        @font-face {
+            font-family: 'Avenir-SemiBold';
+            src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        /* =========================================================
+           2. CONFIGURACIÓN CENTRAL DE TIPOGRAFÍAS Y TAMAÑOS
+           ========================================================= */
+        :root {
+            --fuente-precios: 'Avenir-SemiBold', sans-serif;
+            --fuente-bcv: 'Montserrat', sans-serif;
+
+            /* Tipografía dentro de los cajetines */
+            --tamano-precio-ref: 1.8vw; 
+            --tamano-precio-bs:  1.6vw;
+            --tamano-etiqueta:   1.0vw;
+
+            /* Tarjeta BCV */
+            --tamano-bcv-titulo: 0.90vw;
+            --tamano-bcv-monto:  1.50vw;
+            --tamano-bcv-unidad: 0.85vw;
+            --tamano-bcv-fecha:  0.85vw;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--fuente-precios);
+        }
+
+        /* Canvas horizontal 16:9 */
+        #tv-canvas {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        /* =========================================================
+           VIDEOS SUPERPUESTOS (ZERO-BLINK TRANSITION)
+           ========================================================= */
+        .video-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            z-index: 1;
+            transition: opacity 1.2s ease-in-out;
+        }
+
+        .video-active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* =========================================================
+           TARJETA FLOTANTE BCV OFICIAL
+           ========================================================= */
+        #bcv-card {
+            position: absolute;
+            top: 2.8%;
+            right: 2.5%;
+            background: #ffffff;
+            border: 2.5px solid #200a5e;
+            border-radius: 14px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 10px;
+            gap: 12px;
+            z-index: 50;
+            font-family: var(--fuente-bcv);
+        }
+
+        .bcv-logo-wrapper {
+            width: 3.4vw;
+            height: 3.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bcv-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .bcv-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.15;
+            color: #000000;
+        }
+
+        .bcv-title {
+            font-size: var(--tamano-bcv-titulo);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bcv-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0;
+        }
+
+        .bcv-rate {
+            font-size: var(--tamano-bcv-monto);
+            font-weight: 900;
+            color: #000000;
+            font-family: var(--fuente-precios);
+            display: inline-block;
+        }
+
+        .bcv-unit {
+            font-size: var(--tamano-bcv-unidad);
+            font-weight: 700;
+            color: #4a4a4a;
+        }
+
+        .bcv-date {
+            font-size: var(--tamano-bcv-fecha);
+            font-weight: 700;
+            color: #111111;
+            font-family: var(--fuente-precios);
+        }
+
+        /* =========================================================
+           CAJETÍN 1: EMPANADAS INDIVIDUALES (POSICIÓN EXACTA)
+           ========================================================= */
+        #precio-slot {
+            position: absolute;
+            left: 56.5%;
+            top: 67.5%;
+            width: 19.5%;
+            height: 7.5%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            transform: rotate(-2.5deg);
+        }
+
+        /* =========================================================
+           CAJETÍN 2: COMBOS DE EMPANADAS (POSICIÓN EXACTA)
+           ========================================================= */
+        #combo-slot {
+            position: absolute;
+            left: 71.2%;
+            top: 48.0%;
+            width: 20.5%;
+            height: 8.5%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.35s ease-in-out;
+            transform: rotate(-2.5deg);
+        }
+
+        /* =========================================================
+           LÍNEAS DE PRECIOS Y TIPOGRAFÍAS
+           ========================================================= */
+        .price-line {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            white-space: nowrap;
+            line-height: 1.25;
+        }
+
+        .price-ref {
+            color: #7c2d00;
+            font-size: var(--tamano-precio-ref);
+            font-weight: 600;
+        }
+
+        .price-bs {
+            color: #ffffff;
+            font-size: var(--tamano-precio-bs);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+        }
+
+        .lbl {
+            font-size: var(--tamano-etiqueta);
+            font-weight: 600;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tv-canvas">
+        <!-- VIDEO 1: EMPANADAS INDIVIDUALES -->
+        <video id="video-empanadas" class="video-layer video-active" autoplay muted playsinline preload="auto">
+            <source src="https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Empanadas.mp4" type="video/mp4">
+        </video>
+
+        <!-- VIDEO 2: COMBOS DE EMPANADAS -->
+        <video id="video-combos" class="video-layer" muted playsinline preload="auto">
+            <source src="https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Combo_Empanadas.mp4" type="video/mp4">
+        </video>
+
+        <!-- TARJETA BCV FLOTANTE -->
+        <div id="bcv-card">
+            <div class="bcv-logo-wrapper">
+                <img src="https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/Logo_BCV.png" alt="Logo BCV" class="bcv-img">
+            </div>
+            <div class="bcv-details">
+                <span class="bcv-title">TASA BCV OFICIAL</span>
+                <div class="bcv-price-row">
+                    <span class="bcv-rate" id="val-bcv">0,0000</span>
+                    <span class="bcv-unit">Bs./USD</span>
+                </div>
+                <span class="bcv-date" id="val-fecha">--/--/----</span>
+            </div>
+        </div>
+
+        <!-- CAJETÍN 1: EMPANADA INDIVIDUAL (FILA 2) -->
+        <div id="precio-slot">
+            <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref">0,00</span></div>
+            <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-bs">0,00</span></div>
+        </div>
+
+        <!-- CAJETÍN 2: COMBOS ROTATIVOS (FILAS 3 A 5) -->
+        <div id="combo-slot">
+            <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-combo-ref">0,00</span></div>
+            <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-combo-bs">0,00</span></div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1373857552&single=true&output=csv";
+        const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
+        const SYNC_INTERVAL = 60000;
+
+        // TIMINGS DE CADA VIDEO
+        const DURACION_EMPANADAS = 22.0;
+        const DURACION_COMBOS    = 41.0;
+        const TIEMPO_CROSSFADE   = 1.2;
+
+        // Intervalo de visibilidad en Empanadas
+        const TIME_EMPANADA_IN  = 6.5;
+        const TIME_EMPANADA_OUT = 19.5;
+
+        // Rotación de los 3 Combos
+        const TIMELINE_COMBOS = [
+            { start: 4.8,  end: 9.6,  index: 0 }, // Fila 3: Combo Malta
+            { start: 10.8, end: 18.2, index: 1 }, // Fila 4: Combo Jugo
+            { start: 19.5, end: 27.5, index: 2 }  // Fila 5: Combo Guayoyo
+        ];
+
+        let precioEmpanada = { ref: "0,00", bs: "0,00" };
+        let combosData = [];
+
+        const vidEmpanadas  = document.getElementById('video-empanadas');
+        const vidCombos     = document.getElementById('video-combos');
+        const slotEmpanadas = document.getElementById('precio-slot');
+        const slotCombos    = document.getElementById('combo-slot');
+
+        function parseCSVLine(line) {
+            const result = [];
+            let curValue = "";
+            let inQuotes = false;
+            const delim = (line.match(/;/g) || []).length > (line.match(/,/g) || []).length ? ';' : ',';
+
+            for (let char of line) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === delim && !inQuotes) {
+                    result.push(curValue);
+                    curValue = "";
+                } else curValue += char;
+            }
+            result.push(curValue);
+            return result;
+        }
+
+        function parseCustomFloat(val) {
+            if (!val) return 0;
+            let str = String(val).trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            let n = parseFloat(str.replace(/[^\d.-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatPrice(val) {
+            let n = parseCustomFloat(val);
+            if (n === 0) return "0,00";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatBCVRate(val) {
+            if (!val) return "0,0000";
+            let str = String(val).trim();
+            if (str.includes(',')) str = str.replace(',', '.');
+            let n = parseFloat(str);
+            if (isNaN(n) || n === 0) return "0,0000";
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        }
+
+        function getTodayFormatted() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        // =========================================================
+        // LECTURA DE FILAS (FILA 2: INDIVIDUAL | FILAS 3 A 5: COMBOS)
+        // =========================================================
+        async function fetchMenuData() {
+            try {
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                if (!response.ok) throw new Error("No se pudo descargar el CSV");
+
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(r => r.trim() !== "");
+
+                if (lines.length < 5) return;
+
+                // Fila física 2 (Índice 1) -> Empanada Individual
+                const colsEmp = parseCSVLine(lines[1]);
+                precioEmpanada = {
+                    ref: formatPrice(colsEmp[3]),
+                    bs:  formatPrice(colsEmp[4])
+                };
+                document.getElementById('v-ref').innerText = precioEmpanada.ref;
+                document.getElementById('v-bs').innerText  = precioEmpanada.bs;
+
+                // Filas físicas 3 a 5 (Índices 2 a 4) -> 3 Combos
+                combosData = [];
+                for (let r = 2; r <= 4; r++) {
+                    const colsC = parseCSVLine(lines[r]);
+                    if (!colsC || colsC.length < 5) continue;
+                    combosData.push({
+                        ref: formatPrice(colsC[3]),
+                        bs:  formatPrice(colsC[4])
+                    });
+                }
+            } catch (err) {
+                console.error("Error sincronizando menú:", err);
+            }
+        }
+
+        async function fetchTasaBCV() {
+            try {
+                const response = await fetch(`${BCV_JSON_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error("Error obteniendo tasa.json");
+                
+                const data = await response.json();
+                let rawTasa = data.tasa || data.precio || data.usd || data.dolar || data.rate || data.valor || data.bcv;
+                if (!rawTasa && typeof data === 'object') {
+                    for (let k of Object.keys(data)) {
+                        if (typeof data[k] === 'number' || !isNaN(parseFloat(data[k]))) {
+                            rawTasa = data[k];
+                            break;
+                        }
+                    }
+                }
+
+                let rawFecha = data.fecha || data.date || data.actualizado || getTodayFormatted();
+
+                if (rawTasa) {
+                    const formattedRate = formatBCVRate(rawTasa);
+                    document.getElementById('val-bcv').innerText = formattedRate;
+                    document.getElementById('val-fecha').innerText = rawFecha;
+
+                    localStorage.setItem('cached_tasa_bcv', formattedRate);
+                    localStorage.setItem('cached_fecha_bcv', rawFecha);
+                }
+            } catch (err) {
+                const cachedRate = localStorage.getItem('cached_tasa_bcv');
+                const cachedDate = localStorage.getItem('cached_fecha_bcv');
+                if (cachedRate) document.getElementById('val-bcv').innerText = cachedRate;
+                if (cachedDate) document.getElementById('val-fecha').innerText = cachedDate;
+            }
+        }
+
+        // =========================================================
+        // CONTROLADOR DE TIEMPO DEL VIDEO (DOBLE BUFFER CONTINUO)
+        // =========================================================
+        let videoActivo = 'empanadas';
+        let cambioProgramado = false;
+
+        // Monitoreo video Empanadas
+        vidEmpanadas.addEventListener('timeupdate', () => {
+            const t = vidEmpanadas.currentTime;
+
+            if (videoActivo === 'empanadas' && t >= TIME_EMPANADA_IN && t <= TIME_EMPANADA_OUT) {
+                slotEmpanadas.style.opacity = '1';
+            } else {
+                slotEmpanadas.style.opacity = '0';
+            }
+
+            // A 1.2s antes de terminar, inicia Combos y hace la mezcla
+            if (videoActivo === 'empanadas' && t >= (DURACION_EMPANADAS - TIEMPO_CROSSFADE) && !cambioProgramado) {
+                cambioProgramado = true;
+                pasarACombos();
+            }
+        });
+
+        // Monitoreo video Combos
+        vidCombos.addEventListener('timeupdate', () => {
+            const t = vidCombos.currentTime;
+
+            if (videoActivo === 'combos') {
+                const match = TIMELINE_COMBOS.find(item => t >= item.start && t <= item.end);
+                if (match && combosData[match.index]) {
+                    document.getElementById('v-combo-ref').innerText = combosData[match.index].ref;
+                    document.getElementById('v-combo-bs').innerText  = combosData[match.index].bs;
+                    slotCombos.style.opacity = '1';
+                } else {
+                    slotCombos.style.opacity = '0';
+                }
+            } else {
+                slotCombos.style.opacity = '0';
+            }
+
+            // A 1.2s antes de terminar, inicia Empanadas y hace la mezcla
+            if (videoActivo === 'combos' && t >= (DURACION_COMBOS - TIEMPO_CROSSFADE) && !cambioProgramado) {
+                cambioProgramado = true;
+                pasarAEmpanadas();
+            }
+        });
+
+        function pasarACombos() {
+            vidCombos.currentTime = 0;
+            vidCombos.play();
+            vidCombos.classList.add('video-active');
+
+            setTimeout(() => {
+                vidEmpanadas.classList.remove('video-active');
+                vidEmpanadas.pause();
+                videoActivo = 'combos';
+                cambioProgramado = false;
+            }, TIEMPO_CROSSFADE * 1000);
+        }
+
+        function pasarAEmpanadas() {
+            vidEmpanadas.currentTime = 0;
+            vidEmpanadas.play();
+            vidEmpanadas.classList.add('video-active');
+
+            setTimeout(() => {
+                vidCombos.classList.remove('video-active');
+                vidCombos.pause();
+                videoActivo = 'empanadas';
+                cambioProgramado = false;
+            }, TIEMPO_CROSSFADE * 1000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('val-fecha').innerText = getTodayFormatted();
+            fetchMenuData();
+            fetchTasaBCV();
+
+            setInterval(fetchMenuData, SYNC_INTERVAL);
+            setInterval(fetchTasaBCV, SYNC_INTERVAL);
+
+            vidEmpanadas.play();
+        });
+    </script>
+</body>
+</html>

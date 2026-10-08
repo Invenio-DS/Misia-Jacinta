@@ -13,19 +13,19 @@
         @font-face {
             font-family: 'Avenir-SemiBold';
             src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
-            font-weight: 600;
+            font-weight: 900;
             font-style: normal;
         }
 
         /* =========================================================
-           2. CONFIGURACI”N CENTRAL DE TIPOGRAFÕAS Y TAMA—OS
+           2. CONFIGURACI√ìN CENTRAL DE TIPOGRAF√çAS Y TAMA√ëOS
            ========================================================= */
         :root {
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
             --fuente-bcv: 'Montserrat', sans-serif;
 
-            --tamano-precio-ref: 2.1vw; 
-            --tamano-precio-bs:  1.8vw;
+            --tamano-precio-ref: 241vw; 
+            --tamano-precio-bs:  2.1vw;
             --tamano-etiqueta:   1.2vw;  /* "REF:" y "Bs." */
 
             --tamano-bcv-titulo: 0.90vw;
@@ -51,7 +51,7 @@
             font-family: var(--fuente-precios);
         }
 
-        /* Canvas horizontal 16:9 sincronizado al tamaÒo de la pantalla */
+        /* Canvas horizontal 16:9 sincronizado al tama√±o de la pantalla */
         #tv-canvas {
             position: relative;
             width: 100vw;
@@ -188,19 +188,19 @@
         .price-ref {
             color: #7c2d00;
             font-size: var(--tamano-precio-ref);
-            font-weight: 700;
+            font-weight: 900;
         }
 
         .price-bs {
             color: #ffffff;
             font-size: var(--tamano-precio-bs);
-            font-weight: 700;
+            font-weight: 900;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
         }
 
         .lbl {
             font-size: var(--tamano-etiqueta);
-            font-weight: 700;
+            font-weight: 800;
             opacity: 0.95;
         }
     </style>
@@ -228,7 +228,7 @@
             </div>
         </div>
 
-        <!-- RECUADRO ⁄NICO CENTRAL DE PRECIOS -->
+        <!-- RECUADRO √öNICO CENTRAL DE PRECIOS -->
         <div id="cachapa-slot">
             <div class="size-box">
                 <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref-m">0,00</span></div>
@@ -244,7 +244,7 @@
     <script>
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1337042564&single=true&output=csv";
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
-        const SYNC_INTERVAL = 60000; // SincronizaciÛn cada 60 segundos
+        const SYNC_INTERVAL = 60000; // Sincronizaci√≥n cada 60 segundos
 
         let cachapasPrecios = [];
 
@@ -252,7 +252,7 @@
         const TIMELINE = [
             { start: 3.6,  end: 7.9,  index: 0 }, // Fila 2 de Excel: Queso de mano
             { start: 8.9,  end: 14.3, index: 1 }, // Fila 3 de Excel: Doble queso
-            { start: 15.0, end: 21.3, index: 2 }, // Fila 4 de Excel: JamÛn y queso
+            { start: 15.0, end: 21.3, index: 2 }, // Fila 4 de Excel: Jam√≥n y queso
             { start: 22.2, end: 27.9, index: 3 }, // Fila 5 de Excel: Mechada y queso
             { start: 28.5, end: 34.0, index: 4 }  // Fila 6 de Excel: Pernil y queso
         ];
@@ -325,24 +325,24 @@
 
                 cachapasPrecios = [];
 
-                // Fila fÌsica 2 de Excel = Ìndice 1 en lines
-                // Fila fÌsica 6 de Excel = Ìndice 5 en lines (Exactamente 5 filas)
+                // Fila f√≠sica 2 de Excel = √≠ndice 1 en lines
+                // Fila f√≠sica 6 de Excel = √≠ndice 5 en lines (Exactamente 5 filas)
                 for (let i = 1; i <= 5 && i < lines.length; i++) {
                     const cols = parseCSVLine(lines[i]);
                     if (!cols || cols.length < 7) continue;
 
                     cachapasPrecios.push({
-                        refM: formatPrice(cols[3]), // Columna D (Õndice 3) -> REF Mediana
-                        bsM:  formatPrice(cols[4]), // Columna E (Õndice 4) -> Bs. Mediana
-                        refG: formatPrice(cols[5]), // Columna F (Õndice 5) -> REF Grande
-                        bsG:  formatPrice(cols[6])  // Columna G (Õndice 6) -> Bs. Grande
+                        refM: formatPrice(cols[3]), // Columna D (√çndice 3) -> REF Mediana
+                        bsM:  formatPrice(cols[4]), // Columna E (√çndice 4) -> Bs. Mediana
+                        refG: formatPrice(cols[5]), // Columna F (√çndice 5) -> REF Grande
+                        bsG:  formatPrice(cols[6])  // Columna G (√çndice 6) -> Bs. Grande
                     });
                 }
 
                 console.log(`[Cachapas] ${cachapasPrecios.length} productos cargados correctamente.`);
 
             } catch (err) {
-                console.error("Error sincronizando men˙ de cachapas:", err);
+                console.error("Error sincronizando men√∫ de cachapas:", err);
             }
         }
 
@@ -381,7 +381,7 @@
         }
 
         // =========================================================
-        // CONTROLADOR DE TIEMPO DEL VIDEO (SINCRONIZACI”N)
+        // CONTROLADOR DE TIEMPO DEL VIDEO (SINCRONIZACI√ìN)
         // =========================================================
         const video = document.getElementById('video-bg');
         const priceSlot = document.getElementById('cachapa-slot');

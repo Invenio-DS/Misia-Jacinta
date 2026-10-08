@@ -13,19 +13,19 @@
         @font-face {
             font-family: 'Avenir-SemiBold';
             src: url('https://raw.githubusercontent.com/Invenio-DS/Misia-Jacinta/main/Avenir-SemiBold.otf') format('truetype');
-            font-weight: 600;
+            font-weight: 900;
             font-style: normal;
         }
 
         /* =========================================================
-           2. CONFIGURACI”N CENTRAL DE TIPOGRAFÕAS Y TAMA—OS
+           2. CONFIGURACI√ìN CENTRAL DE TIPOGRAF√çAS Y TAMA√ëOS
            ========================================================= */
         :root {
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
             --fuente-bcv: 'Montserrat', sans-serif;
 
-            --tamano-precio-ref: 2.4vw; 
-            --tamano-precio-bs:  2.1vw;
+            --tamano-precio-ref: 2.7vw; 
+            --tamano-precio-bs:  2.4vw;
             --tamano-etiqueta:   1.50vw;
 
             --tamano-bcv-titulo: 0.90vw;
@@ -75,7 +75,7 @@
             display: block;
             opacity: 0;
             z-index: 1;
-            /* TransiciÛn suave de 1.2s acelerada por GPU */
+            /* Transici√≥n suave de 1.2s acelerada por GPU */
             transition: opacity 1.2s ease-in-out;
             will-change: opacity;
         }
@@ -214,19 +214,19 @@
         .price-ref {
             color: #7c2d00;
             font-size: var(--tamano-precio-ref);
-            font-weight: 600;
+            font-weight: 900;
         }
 
         .price-bs {
             color: #ffffff;
             font-size: var(--tamano-precio-bs);
-            font-weight: 600;
+            font-weight: 900;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
         }
 
         .lbl {
             font-size: var(--tamano-etiqueta);
-            font-weight: 600;
+            font-weight: 800;
             opacity: 0.95;
         }
     </style>
@@ -259,13 +259,13 @@
             </div>
         </div>
 
-        <!-- CAJETÕN EMPANADAS INDIVIDUAL (FILA 2) -->
+        <!-- CAJET√çN EMPANADAS INDIVIDUAL (FILA 2) -->
         <div id="precio-slot">
             <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-ref">0,00</span></div>
             <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-bs">0,00</span></div>
         </div>
 
-        <!-- CAJETÕN COMBOS ROTATIVOS (FILAS 3 A 5) -->
+        <!-- CAJET√çN COMBOS ROTATIVOS (FILAS 3 A 5) -->
         <div id="combo-slot">
             <div class="price-line price-ref"><span class="lbl">REF:</span><span id="v-combo-ref">0,00</span></div>
             <div class="price-line price-bs"><span class="lbl">Bs.</span><span id="v-combo-bs">0,00</span></div>
@@ -277,7 +277,7 @@
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 60000;
 
-        // TIEMPOS DE ANIMACI”N
+        // TIEMPOS DE ANIMACI√ìN
         const DURACION_EMPANADAS = 22.0;
         const DURACION_COMBOS    = 41.0;
         const TIEMPO_FADE        = 1.2;
@@ -411,7 +411,7 @@
         vidEmpanadas.addEventListener('timeupdate', () => {
             const t = vidEmpanadas.currentTime;
 
-            // CajetÌn
+            // Cajet√≠n
             if (videoVisible === 'empanadas' && t >= TIME_EMPANADA_IN && t <= TIME_EMPANADA_OUT) {
                 slotEmpanadas.style.opacity = '1';
             } else {
@@ -423,7 +423,7 @@
                 precargaIniciada = true;
                 vidCombos.currentTime = 0;
                 vidCombos.play().then(() => {
-                    // Espera que ya estÈ corriendo el flujo de video y hace el crossfade
+                    // Espera que ya est√© corriendo el flujo de video y hace el crossfade
                     ejecutarCrossfade(vidEmpanadas, vidCombos, 'combos');
                 }).catch(() => {});
             }
@@ -433,7 +433,7 @@
         vidCombos.addEventListener('timeupdate', () => {
             const t = vidCombos.currentTime;
 
-            // CajetÌn
+            // Cajet√≠n
             if (videoVisible === 'combos') {
                 const match = TIMELINE_COMBOS.find(item => t >= item.start && t <= item.end);
                 if (match && combosData[match.index]) {
@@ -452,7 +452,7 @@
                 precargaIniciada = true;
                 vidEmpanadas.currentTime = 0;
                 vidEmpanadas.play().then(() => {
-                    // Espera que ya estÈ corriendo el flujo de video y hace el crossfade
+                    // Espera que ya est√© corriendo el flujo de video y hace el crossfade
                     ejecutarCrossfade(vidCombos, vidEmpanadas, 'empanadas');
                 }).catch(() => {});
             }
@@ -467,7 +467,7 @@
             vidSaliente.classList.add('video-standby');
             vidSaliente.classList.remove('video-active');
 
-            // Solo tras terminar el fundido (1.3 segundos despuÈs), se retira el viejo
+            // Solo tras terminar el fundido (1.3 segundos despu√©s), se retira el viejo
             setTimeout(() => {
                 vidSaliente.classList.remove('video-standby');
                 vidSaliente.style.opacity = '0';

@@ -18,13 +18,13 @@
         }
 
         /* =========================================================
-           2. CONFIGURACI”N CENTRAL DE TIPOGRAFÕAS Y TAMA—OS
+           2. CONFIGURACI√ìN CENTRAL DE TIPOGRAF√çAS Y TAMA√ëOS
            ========================================================= */
         :root {
             --fuente-precios: 'Avenir-SemiBold', sans-serif;
             --fuente-bcv: 'Montserrat', sans-serif;
 
-            /* TipografÌa y tamaÒos dentro de las cajas amarillas */
+            /* Tipograf√≠a y tama√±os dentro de las cajas amarillas */
             --tamano-precio-ref: 1.11vw; 
             --tamano-precio-bs:  1.11vw;
             --tamano-etiqueta:   0.84vw;
@@ -53,7 +53,7 @@
             font-family: var(--fuente-precios);
         }
 
-        /* Canvas horizontal est·ndar 16:9 */
+        /* Canvas horizontal est√°ndar 16:9 */
         #tv-canvas {
             position: relative;
             width: 100vw;
@@ -165,10 +165,10 @@
             z-index: 20;
             pointer-events: none;
             opacity: 0; /* Inicia difuminado/oculto */
-            transition: opacity 0.45s ease-in-out; /* DifuminaciÛn sutil */
+            transition: opacity 0.45s ease-in-out; /* Difuminaci√≥n sutil */
         }
 
-        /* Estilo base de cada cajetÌn amarillo */
+        /* Estilo base de cada cajet√≠n amarillo */
         .arepa-box {
             position: absolute;
             width: 19.8%;
@@ -189,12 +189,12 @@
         #slot-3 { left: 76.5%; top: 51.0%; } /* Llanera */
 
         /* FILA INFERIOR */
-        #slot-4 { left: 3.9%;  top: 84.8%; } /* JamÛn y queso */
-        #slot-5 { left: 27.3%; top: 84.8%; } /* Pel˙a */
-        #slot-6 { left: 52.0%; top: 84.8%; } /* PÈrnil */
-        #slot-7 { left: 76.5%; top: 84.8%; } /* PabellÛn */
+        #slot-4 { left: 3.9%;  top: 84.8%; } /* Jam√≥n y queso */
+        #slot-5 { left: 27.3%; top: 84.8%; } /* Pel√∫a */
+        #slot-6 { left: 52.0%; top: 84.8%; } /* P√©rnil */
+        #slot-7 { left: 76.5%; top: 84.8%; } /* Pabell√≥n */
 
-        /* Bloque interno de tamaÒo: Mediana (izq) y Grande (der) */
+        /* Bloque interno de tama√±o: Mediana (izq) y Grande (der) */
         .size-box {
             width: 48%;
             display: flex;
@@ -309,7 +309,7 @@
                 </div>
             </div>
 
-            <!-- 5. JamÛn y queso -->
+            <!-- 5. Jam√≥n y queso -->
             <div class="arepa-box" id="slot-4">
                 <div class="size-box">
                     <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
@@ -321,7 +321,7 @@
                 </div>
             </div>
 
-            <!-- 6. Pel˙a -->
+            <!-- 6. Pel√∫a -->
             <div class="arepa-box" id="slot-5">
                 <div class="size-box">
                     <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
@@ -333,7 +333,7 @@
                 </div>
             </div>
 
-            <!-- 7. PÈrnil -->
+            <!-- 7. P√©rnil -->
             <div class="arepa-box" id="slot-6">
                 <div class="size-box">
                     <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
@@ -345,7 +345,7 @@
                 </div>
             </div>
 
-            <!-- 8. PabellÛn -->
+            <!-- 8. Pabell√≥n -->
             <div class="arepa-box" id="slot-7">
                 <div class="size-box">
                     <div class="price-line price-ref"><span class="lbl">REF:</span><span class="v-ref-m">0,00</span></div>
@@ -361,19 +361,19 @@
 
     <script>
         // =========================================================
-        // 1. CONFIGURACI”N DE TIEMPOS DEL VIDEO (EDITABLE)
+        // 1. CONFIGURACI√ìN DE TIEMPOS DEL VIDEO (EDITABLE)
         // =========================================================
         const TIME_FADE_IN  = 6.0;  // Segundo en que APARECEN los precios sutilmente
         const TIME_FADE_OUT = 19.3; // Segundo en que DESAPARECEN los precios sutilmente
 
         // =========================================================
-        // 2. CONFIGURACI”N DE FILAS DE GOOGLE SHEETS (EDITABLE)
+        // 2. CONFIGURACI√ìN DE FILAS DE GOOGLE SHEETS (EDITABLE)
         // =========================================================
-        // Filas fÌsicas en Excel: de la fila 7 a la 14
-        const EXCEL_ROW_START = 6;  
-        const EXCEL_ROW_END   = 13; 
+        // Filas f√≠sicas en Excel: de la fila 7 a la 14
+        const EXCEL_ROW_START = 7;  
+        const EXCEL_ROW_END   = 14; 
 
-        // URLs de integraciÛn
+        // URLs de integraci√≥n
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSshcCDkIRx09zv0B5_uDj_F2C0lc4BoVt29XRyjtnEt2SsF9AQLfMz-qIsJ-TI0nfUm52cFNYBRM4z/pub?gid=1410264874&single=true&output=csv";
         const BCV_JSON_URL = "https://raw.githubusercontent.com/Invenio-DS/Tasa_BCV/main/tasa.json";
         const SYNC_INTERVAL = 60000; // Sincroniza hoja cada 60 segundos
@@ -446,9 +446,9 @@
 
                 arepasData = [];
 
-                // Convertimos el rango de filas de Excel a Ìndices de array en JavaScript (Excel - 1)
-                const startIndex = EXCEL_ROW_START - 1; // Fila 7 -> Ìndice 6
-                const endIndex   = EXCEL_ROW_END - 1;   // Fila 14 -> Ìndice 13
+                // Convertimos el rango de filas de Excel a √≠ndices de array en JavaScript (Excel - 1)
+                const startIndex = EXCEL_ROW_START - 1; // Fila 7 -> √≠ndice 6
+                const endIndex   = EXCEL_ROW_END - 1;   // Fila 14 -> √≠ndice 13
 
                 for (let r = startIndex; r <= endIndex && r < lines.length; r++) {
                     const cols = parseCSVLine(lines[r]);
@@ -484,7 +484,7 @@
         }
 
         // =========================================================
-        // CONTROLADOR DE TIEMPOS CON DIFUMINACI”N SUTIL
+        // CONTROLADOR DE TIEMPOS CON DIFUMINACI√ìN SUTIL
         // =========================================================
         const video = document.getElementById('video-bg');
         const pricesLayer = document.getElementById('prices-layer');
@@ -492,7 +492,7 @@
         video.addEventListener('timeupdate', () => {
             const t = video.currentTime;
 
-            // DifuminaciÛn: aparece a los 6.0s y desaparece a los 19.3s
+            // Difuminaci√≥n: aparece a los 6.0s y desaparece a los 19.3s
             if (t >= TIME_FADE_IN && t <= TIME_FADE_OUT) {
                 pricesLayer.style.opacity = '1';
             } else {
